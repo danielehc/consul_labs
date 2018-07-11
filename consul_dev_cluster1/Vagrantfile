@@ -1,0 +1,34 @@
+# Specify a Consul version
+CONSUL_DEMO_VERSION = ENV['CONSUL_DEMO_VERSION']
+
+# Specify a custom Vagrant box for the demo
+DEMO_BOX_NAME = ENV['DEMO_BOX_NAME'] || "debian/stretch64"
+
+# Vagrantfile API/syntax version.
+# NB: Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = DEMO_BOX_NAME
+  
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+    v.cpus = 2
+  end
+
+  config.vm.define "c1" do |c1|
+      c1.vm.hostname = "c1"
+      c1.vm.network "private_network", ip: "172.20.20.10"
+      c1.vm.provision "shell",
+                          path: "provision.sh",
+                          env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION , 'IP' => "172.20.20.10" }
+  end
+
+  config.vm.define "c2" do |c2|
+      c2.vm.hostname = "c2"
+      c2.vm.network "private_network", ip: "172.20.20.11"
+      c2.vm.provision "shell",
+                          path: "provision.sh",
+                          env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION , 'IP' => "172.20.20.11" }
+  end
+end
