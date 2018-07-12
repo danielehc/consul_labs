@@ -21,7 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       c1.vm.hostname = "c1"
       c1.vm.network "private_network", ip: "172.20.20.10"
       c1.vm.provision "shell",
-                          path: "scripts/provision.sh",
+                          path: "scripts/provision.sh", run: "always",
                           env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION , 'IP' => "172.20.20.10" }
   end
 
@@ -29,7 +29,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       c2.vm.hostname = "c2"
       c2.vm.network "private_network", ip: "172.20.20.11"
       c2.vm.provision "shell",
-                          path: "scripts/provision.sh",
+                          path: "scripts/provision.sh", run: "always",
                           env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION , 'IP' => "172.20.20.11" }
   end
 end
