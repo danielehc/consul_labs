@@ -17,19 +17,39 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.cpus = 2
   end
 
-  config.vm.define "c1" do |c1|
-      c1.vm.hostname = "c1"
-      c1.vm.network "private_network", ip: "172.20.20.10"
-      c1.vm.provision "shell",
-                          path: "scripts/provision.sh", run: "always",
-                          env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION , 'IP' => "172.20.20.10" }
+
+  #consul server
+  (1..3).each do |i|
+    config.vm.define vm_name = "consul#{i}" do |server|
+        server.vm.hostname = vm_name
+        server.vm.network "private_network", ip: "172.20.20.1#{i}"
+        server.vm.provision "shell", path: "scripts/consul.sh"
+    end
   end
 
-  config.vm.define "c2" do |c2|
-      c2.vm.hostname = "c2"
-      c2.vm.network "private_network", ip: "172.20.20.11"
-      c2.vm.provision "shell",
-                          path: "scripts/provision.sh", run: "always",
-                          env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION , 'IP' => "172.20.20.11" }
+
+  #consul agents
+  (1..2).each do |i|
+    config.vm.define vm_name = "node#{i}" do |agent|
+        agent.vm.hostname = vm_name
+        agent.vm.network "private_network", ip: "172.20.20.2#{i}"
+        agent.vm.provision "shell", path: "scripts/consul.sh"
+    end
   end
+
+  #~ config.vm.define "c1" do |c1|
+      #~ c1.vm.hostname = "c1"
+      #~ c1.vm.network "private_network", ip: "172.20.20.10"
+      #~ c1.vm.provision "shell",
+                          #~ path: "scripts/provision.sh", run: "always",
+                          #~ env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION}
+  #~ end
+
+  #~ config.vm.define "c2" do |c2|
+      #~ c2.vm.hostname = "c2"
+      #~ c2.vm.network "private_network", ip: "172.20.20.11"
+      #~ c2.vm.provision "shell",
+                          #~ path: "scripts/provision.sh", run: "always",
+                          #~ env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION}
+  #~ end
 end

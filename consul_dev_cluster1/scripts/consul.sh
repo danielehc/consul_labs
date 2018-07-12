@@ -3,10 +3,12 @@ set -x
 
 #dnsutils
 #if the tools aren't installed, we install them
-which unzip curl jq &>/dev/null || {
+which unzip curl jq route &>/dev/null || {
     echo "Installing dependencies ..."
     sudo apt-get update
-    sudo apt-get install -y unzip curl jq 
+    sudo apt-get install -y unzip curl jq net-tools
+    
+    sudo apt-get clean
 }
 
 #if no consul binary we download one
@@ -32,17 +34,32 @@ which consul &>/dev/null || {
     sudo chmod a+w /etc/consul.d
 
     echo "Recovering some space ..."
-    sudo apt-get clean
     sudo rm -rf /tmp/consul.zip
 }
 
-#if not running we start consul
-#IP variable is being set by Vagrant
-/usr/bin/consul members 2>/dev/null || {
-echo "Starting Consul cluster ..."
-/usr/bin/consul agent -server -ui -client=0.0.0.0 -bind=${IP} -data-dir=/tmp/consul -join=172.20.20.10 -join=172.20.20.11 -bootstrap-expect=2 > ${HOME}/${HOSTNAME}.log &
-sleep 1
-}
+# Getting node IP
+IFACE=`route -n | awk '$1 == "172.20.20.0" {print $8}'`
+CIDR=`ip addr show ${IFACE} | awk '$2 ~ "172.20.20" {print $2}'`
+IP=${CIDR%%/24}
 
+#if not running we start consul
+if [[ "${HOSTNAME}" =~ "consul" ]]; then
+	echo server
+
+	/usr/bin/consul members 2>/dev/null || {
+		echo "Starting Consul cluster ..."
+		/usr/bin/consul agent -server -ui -client=0.0.0.0 -bind=${IP} -data-dir=/tmp/consul -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 -bootstrap-expect=3 > ${HOME}/${HOSTNAME}.log &
+		sleep 1
+	}
+else
+	echo agent
+	/usr/local/bin/consul members 2>/dev/null || {
+		/usr/bin/consul agent -bind=${IP} -data-dir=/tmp/consul -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 > ${HOME}/${HOSTNAME}.log &
+		sleep 1
+	}
+fi
+
+# Check cluster state
+/usr/bin/consul members
 
 set +x 
