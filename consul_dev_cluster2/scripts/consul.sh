@@ -7,7 +7,6 @@ which unzip curl jq route &>/dev/null || {
     echo "Installing dependencies ..."
     sudo apt-get update
     sudo apt-get install -y unzip curl jq net-tools dnsutils
-    
     sudo apt-get clean
 }
 

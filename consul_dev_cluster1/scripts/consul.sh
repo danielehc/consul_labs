@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
-set -x 
 
-#dnsutils
 #if the tools aren't installed, we install them
 which unzip curl jq route &>/dev/null || {
     echo "Installing dependencies ..."
     sudo apt-get update
     sudo apt-get install -y unzip curl jq net-tools
-    
-    sudo apt-get clean
 }
 
 #if no consul binary we download one
@@ -35,6 +31,7 @@ which consul &>/dev/null || {
 
     echo "Recovering some space ..."
     sudo rm -rf /tmp/consul.zip
+    sudo apt-get clean
 }
 
 # Getting node IP
@@ -61,5 +58,3 @@ fi
 
 # Check cluster state
 /usr/bin/consul members
-
-set +x 

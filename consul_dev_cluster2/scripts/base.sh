@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -x
 
 # Tools installed in this script shouldeventually end up being installed
