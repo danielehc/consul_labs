@@ -12,7 +12,6 @@ which redis-server 2>/dev/null || {
 
 /etc/init.d/redis-server status 2>/dev/null && /etc/init.d/redis-server force-reload 2>/dev/null || /etc/init.d/redis-server start 2>/dev/null
 
-
 # If service is not present in the /etc/consul.d folder creates a service file
 if [ ! -f "/etc/consul.d/redis.service.json" ] || [ ! -f "/etc/consul.d/redis.healthcheck.json" ]; then
 	
@@ -23,9 +22,6 @@ if [ ! -f "/etc/consul.d/redis.service.json" ] || [ ! -f "/etc/consul.d/redis.he
 	#Copy Files
 	cp /vagrant/etc/redis* /etc/consul.d/
 	
-	#ls -la /etc/consul.d/	
-	#~ echo '{"service": {"name": "redis", "tags": ["redis-server"], "port": 6379}}' | sudo tee /etc/consul.d/redis.json
-
 fi
 
 set +x
