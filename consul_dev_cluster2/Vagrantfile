@@ -1,6 +1,6 @@
 # Specify a Consul version
 # if no version given, will try to get latests using checkpoint
-CONSUL_DEMO_VERSION = ENV['CONSUL_DEMO_VERSION']
+#~ CONSUL_DEMO_VERSION = ENV['CONSUL_DEMO_VERSION']
 
 # Specify a custom Vagrant box for the demo
 DEMO_BOX_NAME = ENV['DEMO_BOX_NAME'] || "debian/stretch64"
@@ -17,49 +17,48 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.cpus = 2
   end
 
-
   #consul server
   (1..3).each do |i|
     config.vm.define vm_name = "consul#{i}" do |server|
         server.vm.hostname = vm_name
         server.vm.network "private_network", ip: "172.20.20.1#{i}"
+        #~ server.vm.provision "shell", path: "scripts/base.sh", run: "always"
         server.vm.provision "shell", path: "scripts/consul.sh", run: "always"
     end
   end
 
-
-  #consul agents
-  (1..2).each do |i|
-    config.vm.define vm_name = "node#{i}" do |agent|
-        agent.vm.hostname = vm_name
-        agent.vm.network "private_network", ip: "172.20.20.2#{i}"
-        agent.vm.provision "shell", path: "scripts/consul.sh", run: "always"
-    end
-  end
+  #~ #consul agents
+  #~ (1..2).each do |i|
+    #~ config.vm.define vm_name = "node#{i}" do |agent|
+        #~ agent.vm.hostname = vm_name
+        #~ agent.vm.network "private_network", ip: "172.20.20.2#{i}"
+        #~ agent.vm.provision "shell", path: "scripts/consul.sh", run: "always"
+    #~ end
+  #~ end
 
   # Redis Server
   config.vm.define "redis-server" do |rs|
       rs.vm.hostname = "redis"
       rs.vm.network "private_network", ip: "172.20.20.31"
+      #~ rs.vm.provision "shell", path: "scripts/base.sh", run: "always" 
       rs.vm.provision "shell", path: "scripts/redis.sh", run: "always"
-      rs.vm.provision "shell", path: "scripts/consul.sh", run: "always"
-                          
+      #~ rs.vm.provision "file", source: "etc/redis.service", destination: "/etc/consul.d/redis.service"
+      #~ rs.vm.provision "file", source: "etc/redis.healthcheck", destination: "/etc/consul.d/redis.healthcheck"
+      rs.vm.provision "shell", path: "scripts/consul.sh", run: "always"                       
   end
 
-
-  #~ config.vm.define "c1" do |c1|
-      #~ c1.vm.hostname = "c1"
-      #~ c1.vm.network "private_network", ip: "172.20.20.10"
-      #~ c1.vm.provision "shell",
-                          #~ path: "scripts/provision.sh", run: "always",
-                          #~ env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION}
-  #~ end
-
-  #~ config.vm.define "c2" do |c2|
-      #~ c2.vm.hostname = "c2"
-      #~ c2.vm.network "private_network", ip: "172.20.20.11"
-      #~ c2.vm.provision "shell",
-                          #~ path: "scripts/provision.sh", run: "always",
-                          #~ env: {'CONSUL_DEMO_VERSION' => CONSUL_DEMO_VERSION}
-  #~ end
+  # Legacy App
+  config.vm.define "legacy-app" do |la|
+      la.vm.hostname = "legacy"
+      la.vm.network "private_network", ip: "172.20.20.32"
+      #~ la.vm.provision "shell", path: "scripts/base.sh", run: "always" 
+      la.vm.provision "shell", path: "scripts/dnsmasq.sh", run: "always"
+      la.vm.provision "shell", path: "scripts/consul.sh", run: "always"  
+      la.vm.provision "shell", path: "scripts/app_legacy.sh", run: "always"  
+       
+	  #~ la.trigger.after :up do |trigger|
+		#~ trigger.name = "Hello world"
+		#~ trigger.info = "I am running after vagrant up!!"
+	  #~ end
+  end
 end

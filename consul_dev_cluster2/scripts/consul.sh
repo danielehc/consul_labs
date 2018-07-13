@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -x 
 
-#dnsutils
-#if the tools aren't installed, we install them
-which unzip curl jq route dig &>/dev/null || {
+# The VM should already have these tools but in case theey are not 
+# there we reinstall them
+which unzip curl jq route &>/dev/null || {
     echo "Installing dependencies ..."
     sudo apt-get update
     sudo apt-get install -y unzip curl jq net-tools dnsutils
@@ -48,13 +48,13 @@ if [[ "${HOSTNAME}" =~ "consul" ]]; then
 
 	/usr/bin/consul members 2>/dev/null || {
 		echo "Starting Consul cluster ..."
-		/usr/bin/consul agent -server -ui -client=0.0.0.0 -bind=${IP} -data-dir=/tmp/consul -config-dir=/etc/consul.d -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 -bootstrap-expect=3 > ${HOME}/${HOSTNAME}.log &
+		/usr/bin/consul agent -server -ui -client=0.0.0.0 -bind=${IP} -data-dir=/tmp/consul -config-dir=/etc/consul.d -enable-script-checks  -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 -bootstrap-expect=3 > ${HOME}/${HOSTNAME}.log &
 		sleep 1
 	}
 else
 	echo agent
 	/usr/local/bin/consul members 2>/dev/null || {
-		/usr/bin/consul agent -bind=${IP} -data-dir=/tmp/consul -config-dir=/etc/consul.d -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 > ${HOME}/${HOSTNAME}.log &
+		/usr/bin/consul agent -bind=${IP} -data-dir=/tmp/consul -config-dir=/etc/consul.d -enable-script-checks -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 > ${HOME}/${HOSTNAME}.log &
 		sleep 1
 	}
 fi
