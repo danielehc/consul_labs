@@ -17,7 +17,12 @@ if [ ! -f "/etc/dnsmasq.d/10-consul" ]; then
 	#Copy Files
 	cp /vagrant/etc/dnsmasq_consul.conf /etc/dnsmasq.d/10-consul
 	mv /etc/resolv.conf /etc/resolv.conf.orig
-	cat /vagrant/etc/dnsmasq_resolv.conf /etc/resolv.conf.orig > /etc/resolv.conf
+	
+	sed -e '$s/$/\n/' -s /vagrant/etc/dnsmasq_resolv.conf /etc/resolv.conf.orig > /etc/resolv.conf
+	
+	cat /etc/resolv.conf
+	
+	#~ cat /vagrant/etc/dnsmasq_resolv.conf /etc/resolv.conf.orig > /etc/resolv.conf
 
 	service dnsmasq restart
 
