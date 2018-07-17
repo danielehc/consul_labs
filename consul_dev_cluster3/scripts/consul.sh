@@ -62,7 +62,7 @@ mkdir -p /etc/consul.d
 if [[ "${HOSTNAME}" =~ "consul" ]]; then
 	echo server
 
-	/usr/local/bin/consul members 2>/dev/null || {
+	/usr/local/bin/consul members &>/dev/null || {
 		echo "Starting Consul cluster ..."
 		/usr/local/bin/consul agent -server -ui -client=0.0.0.0 -bind=${IP} -data-dir=/tmp/consul -config-dir=/etc/consul.d -enable-script-checks  -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 -bootstrap-expect=3 > ${HOME}/${HOSTNAME}.log &
 		sleep 1
