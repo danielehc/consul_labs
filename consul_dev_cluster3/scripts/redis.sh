@@ -24,5 +24,13 @@ if [ ! -f "/etc/consul.d/redis.service.json" ] || [ ! -f "/etc/consul.d/redis.he
 	
 fi
 
+which killall &>/dev/null || {
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y psmisc
+}
+
+killall -1 consul
+
 set +x
 
