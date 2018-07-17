@@ -41,16 +41,32 @@ touch "/etc/bash.bashrc"
 		echo '# GoLang'
 		echo "export GOROOT=$INSTALL_PATH"
 		echo 'export PATH=$PATH:$GOROOT/bin'
-		#~ echo 'export GOPATH=/vagrant'
+		#~ echo 'export GOPATH=/vagrant/pkg/go'
 		#~ echo 'export PATH=$PATH:$GOPATH/bin'
 } >> "/etc/bash.bashrc"
 
 export GOROOT=$INSTALL_PATH
 export PATH=$PATH:$GOROOT/bin
-#~ export GOPATH=/vagrant
+#~ export GOPATH=/vagrant/pkg/go
 #~ export PATH=$PATH:$GOPATH/bin
 
 rm -f /tmp/go.tar.gz
+
+
+#~ Registering the service
+# If service is not present in the /etc/consul.d folder creates a service file
+#~ if [ ! -f "/etc/consul.d/webapp.service.json" ] || [ ! -f "/etc/consul.d/redis.healthcheck.json" ]; then
+if [ ! -f "/etc/consul.d/webapp.service.json" ]; then
+	
+	# Creates folder
+	sudo mkdir -p /etc/consul.d
+	sudo chmod a+w /etc/consul.d	
+	
+	#Copy Files
+	cp /vagrant/etc/webapp* /etc/consul.d/
+	
+fi
+
 
 # Instaling required packaged for the app
 go get -u github.com/hashicorp/consul/api
@@ -58,7 +74,17 @@ go get -u github.com/go-redis/redis
 
 # Running the app
 go run /vagrant/src/hello.go
-go run /vagrant/src/modern_app.go
-
+#~ go run /vagrant/src/modern_app.go &
+#~ nohup go run /vagrant/src/modern_app_web.go & 
+go build /vagrant/src/modern_app_web.go
+	
+if [ -f modern_app_web ]; then
+	sudo cp modern_app_web /usr/local/bin
+	/usr/local/bin/modern_app_web &
+	sleep 1
+	
+else
+		echo 'Erro in building the go application'
+fi
 
 set +x

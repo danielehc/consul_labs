@@ -57,8 +57,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # ma.vm.provision "shell", path: "scripts/dnsmasq.sh", run: "always"
       
       # ma.vm.provision "shell", path: "scripts/app_legacy.sh", run: "always"  
-      ma.vm.provision "shell", path: "scripts/consul.sh", run: "always"  
       ma.vm.provision "shell", path: "scripts/golang.sh", run: "always"  
+      ma.vm.provision "shell", path: "scripts/consul.sh", run: "always"  
+      
        
 	  # ma.trigger.after :up do |trigger|
 		# trigger.name = "Hello world"
@@ -67,18 +68,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
 
-  # Legacy App
-  config.vm.define "legacy-app" do |la|
-      la.vm.hostname = "legacy"
-      la.vm.network "private_network", ip: "172.20.20.33"
-      # la.vm.provision "shell", path: "scripts/base.sh", run: "always" 
-      la.vm.provision "shell", path: "scripts/dnsmasq.sh", run: "always"
-      la.vm.provision "shell", path: "scripts/consul.sh", run: "always"  
-      la.vm.provision "shell", path: "scripts/app_legacy.sh", run: "always"  
+  #~ # Legacy App
+  #~ config.vm.define "legacy-app" do |la|
+      #~ la.vm.hostname = "legacy"
+      #~ la.vm.network "private_network", ip: "172.20.20.33"
+      #~ # la.vm.provision "shell", path: "scripts/base.sh", run: "always" 
+      #~ la.vm.provision "shell", path: "scripts/dnsmasq.sh", run: "always"
+      #~ la.vm.provision "shell", path: "scripts/consul.sh", run: "always"  
+      #~ la.vm.provision "shell", path: "scripts/app_legacy.sh", args: "&", run: "always"  
        
-	  # la.trigger.after :up do |trigger|
-		# trigger.name = "Hello world"
-		# trigger.info = "I am running after vagrant up!!"
-	  # end
-  end
+	  #~ # la.trigger.after :up do |trigger|
+		#~ # trigger.name = "Hello world"
+		#~ # trigger.info = "I am running after vagrant up!!"
+	  #~ # end
+  #~ end
 end

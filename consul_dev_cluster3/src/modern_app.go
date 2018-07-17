@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"github.com/hashicorp/consul/api"
 	"github.com/go-redis/redis"
+	"time"
 )
 
 func main() {
@@ -64,12 +65,15 @@ func main() {
 
 	//~ pong, err := client.Ping().Result()
 	//~ fmt.Println(pong, err)
-	
-	result, err := client.Incr("modern_app").Result()
-	if err != nil {
-		panic(err)
-	}
+	for {
+			result, err := client.Incr("counter_modern").Result()
+			if err != nil {
+				panic(err)
+			}
 
-	fmt.Println(result)
+		fmt.Println(result)
+		time.Sleep(5 * time.Second)
+	}
+	
 	
 }
