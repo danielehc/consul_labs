@@ -1,9 +1,4 @@
-# Specify a Consul version
-# if no version given, will try to get latests using checkpoint
-#~ CONSUL_DEMO_VERSION = ENV['CONSUL_DEMO_VERSION']
-
 # Specify a custom Vagrant box for the demo
-#~ DEMO_BOX_NAME = ENV['DEMO_BOX_NAME'] || "debian/stretch64"
 DEMO_BOX_NAME = ENV['DEMO_BOX_NAME'] || "danielec/stretch64"
 
 # Vagrantfile API/syntax version.
@@ -12,6 +7,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = DEMO_BOX_NAME
+  config.vm.provision "shell", path: "scripts/consul.sh", run: "always"
   
   config.vm.provider "virtualbox" do |v|
     v.memory = 1024
@@ -24,62 +20,23 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define vm_name = "consul#{i}" do |server|
         server.vm.hostname = vm_name
         server.vm.network "private_network", ip: "172.20.20.1#{i}"
-        # server.vm.provision "shell", path: "scripts/base.sh", run: "always"
-        server.vm.provision "shell", path: "scripts/consul.sh", run: "always"
+
     end
   end
 
-  #~ #consul agents
-  #~ (1..2).each do |i|
-    #~ config.vm.define vm_name = "node#{i}" do |agent|
-        #~ agent.vm.hostname = vm_name
-        #~ agent.vm.network "private_network", ip: "172.20.20.2#{i}"
-        #~ agent.vm.provision "shell", path: "scripts/consul.sh", run: "always"
-    #~ end
-  #~ end
 
   # Redis Server
   config.vm.define "redis-server" do |rs|
       rs.vm.hostname = "redis"
       rs.vm.network "private_network", ip: "172.20.20.31"
-      # rs.vm.provision "shell", path: "scripts/base.sh", run: "always" 
-      rs.vm.provision "shell", path: "scripts/redis.sh", run: "always"
-      # rs.vm.provision "file", source: "etc/redis.service", destination: "/etc/consul.d/redis.service"
-      # rs.vm.provision "file", source: "etc/redis.healthcheck", destination: "/etc/consul.d/redis.healthcheck"
-      rs.vm.provision "shell", path: "scripts/consul.sh", run: "always"                       
+      rs.vm.provision "shell", path: "scripts/redis.sh", run: "always"                   
   end
 
   # Modern App
   config.vm.define "modern-app" do |ma|
       ma.vm.hostname = "modern"
       ma.vm.network "private_network", ip: "172.20.20.32"
-      # ma.vm.provision "shell", path: "scripts/base.sh", run: "always" 
-      # ma.vm.provision "shell", path: "scripts/dnsmasq.sh", run: "always"
-      
-      # ma.vm.provision "shell", path: "scripts/app_legacy.sh", run: "always"  
       ma.vm.provision "shell", path: "scripts/golang.sh", run: "always"  
-      ma.vm.provision "shell", path: "scripts/consul.sh", run: "always"  
-      
-       
-	  # ma.trigger.after :up do |trigger|
-		# trigger.name = "Hello world"
-		# trigger.info = "I am running after vagrant up!!"
-	  # end
   end
 
-
-  #~ # Legacy App
-  #~ config.vm.define "legacy-app" do |la|
-      #~ la.vm.hostname = "legacy"
-      #~ la.vm.network "private_network", ip: "172.20.20.33"
-      #~ # la.vm.provision "shell", path: "scripts/base.sh", run: "always" 
-      #~ la.vm.provision "shell", path: "scripts/dnsmasq.sh", run: "always"
-      #~ la.vm.provision "shell", path: "scripts/consul.sh", run: "always"  
-      #~ la.vm.provision "shell", path: "scripts/app_legacy.sh", args: "&", run: "always"  
-       
-	  #~ # la.trigger.after :up do |trigger|
-		#~ # trigger.name = "Hello world"
-		#~ # trigger.info = "I am running after vagrant up!!"
-	  #~ # end
-  #~ end
 end
