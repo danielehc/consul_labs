@@ -70,7 +70,7 @@ if [[ "${HOSTNAME}" =~ "consul" ]]; then
 else
 	echo agent
 	/usr/local/bin/consul members &>/dev/null || {
-		/usr/local/bin/consul agent -bind=${IP} -data-dir=/tmp/consul -config-dir=/etc/consul.d -enable-script-checks -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 > ${HOME}/${HOSTNAME}.log &
+		/usr/local/bin/consul agent -client=0.0.0.0 -bind=${IP} -data-dir=/tmp/consul -config-dir=/etc/consul.d -enable-script-checks -join=172.20.20.11 -join=172.20.20.12 -join=172.20.20.13 > ${HOME}/${HOSTNAME}.log &
 		sleep 1
 	}
 fi
