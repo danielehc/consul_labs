@@ -80,11 +80,11 @@ go build /vagrant/src/modern_app_web.go
 	
 if [ -f modern_app_web ]; then
 	sudo cp modern_app_web /usr/local/bin
-	/usr/local/bin/modern_app_web &
+	/usr/local/bin/modern_app_web > app.log &
 	sleep 1
 	
 else
-		echo 'Erro in building the go application'
+		echo 'Error in building the go application'
 fi
 
 set +x

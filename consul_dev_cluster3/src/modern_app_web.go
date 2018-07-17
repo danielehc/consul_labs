@@ -56,73 +56,83 @@ func main() {
 
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-    
-  var consulClient *api.Client
-	
-	consulClient, err := api.NewClient(api.DefaultConfig())
-	
-	if err !=nil {
+  var validPath = regexp.MustCompile("^[/]$")
 		
-		http.Error(w, "0", http.StatusInternalServerError)
-		fmt.Printf("Failed to contact consul: %s \n", err)
-		healthStatus = "KO"
-		return
-	}
+	m := validPath.FindStringSubmatch(r.URL.Path)
 	
-	consulCatalog := consulClient.Catalog()
-	
-	var serviceDetail strings.Builder
-	
-	redisService, _, err := consulCatalog.Service("redis", "", nil)
-	if err != nil {
-		http.Error(w, "0", http.StatusInternalServerError)
-		fmt.Printf("Failed to discover Redis Service: %s \n", err)
-		healthStatus = "KO"
-		return
-	}
-	
-	if redisService == nil {
-		
-		http.Error(w, "0", http.StatusInternalServerError)
-		fmt.Printf("Service is null. \n")
-		healthStatus = "KO"
-		return
-		
+	if m == nil {
+			http.NotFound(w, r)
+			//~ fmt.Fprintf(w, "Something weird happened!\n")
 	} else {
+		  
+		var consulClient *api.Client
 		
-		fmt.Printf("Service is not null. \n")
+		consulClient, err := api.NewClient(api.DefaultConfig())
 		
-		if (len(redisService) == 0){
+		if err !=nil {
+			
 			http.Error(w, "0", http.StatusInternalServerError)
-			fmt.Printf("...Still there is no service for what you asked. \n")
+			fmt.Printf("Failed to contact consul: %s \n", err)
+			healthStatus = "KO"
+			return
+		}
+		
+		consulCatalog := consulClient.Catalog()
+		
+		var serviceDetail strings.Builder
+		
+		redisService, _, err := consulCatalog.Service("redis", "", nil)
+		if err != nil {
+			http.Error(w, "0", http.StatusInternalServerError)
+			fmt.Printf("Failed to discover Redis Service: %s \n", err)
+			healthStatus = "KO"
+			return
+		}
+		
+		if redisService == nil {
+			
+			http.Error(w, "0", http.StatusInternalServerError)
+			fmt.Printf("Service is null. \n")
 			healthStatus = "KO"
 			return
 			
 		} else {
+			
+			fmt.Printf("Service is not null. \n")
+			
+			if (len(redisService) == 0){
+				http.Error(w, "0", http.StatusInternalServerError)
+				fmt.Printf("...Still there is no service for what you asked. \n")
+				healthStatus = "KO"
+				return
 				
-			serviceDetail.WriteString(string(redisService[0].Address))
-			serviceDetail.WriteString(":")
-			//~ https://golang.org/pkg/strconv/
-			serviceDetail.WriteString(strconv.Itoa(redisService[0].ServicePort))
-		 
-			fmt.Printf("Found Redis service at: %s \n", serviceDetail.String())	
-			healthStatus = "OK"
+			} else {
+					
+				serviceDetail.WriteString(string(redisService[0].Address))
+				serviceDetail.WriteString(":")
+				//~ https://golang.org/pkg/strconv/
+				serviceDetail.WriteString(strconv.Itoa(redisService[0].ServicePort))
+			 
+				fmt.Printf("Found Redis service at: %s \n", serviceDetail.String())	
+				healthStatus = "OK"
+			}
 		}
+		
+		//~ https://github.com/go-redis/redis/blob/master/example_test.go
+		client := redis.NewClient(&redis.Options{
+			Addr:     serviceDetail.String(),
+			Password: "", // no password set
+			DB:       0,  // use default DB
+		})
+		
+		result, err := client.Incr("modern_app").Result()
+		if err != nil {
+			http.Error(w, "0", http.StatusInternalServerError)
+			return
+		}    
+		
+		fmt.Fprintf(w, "%d", result)
 	}
-	
-	//~ https://github.com/go-redis/redis/blob/master/example_test.go
-	client := redis.NewClient(&redis.Options{
-		Addr:     serviceDetail.String(),
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-	
-	result, err := client.Incr("modern_app").Result()
-	if err != nil {
-		panic(err)
-	}    
-  
-  fmt.Fprintf(w, "%d", result)
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request){
@@ -134,6 +144,7 @@ func healthHandler(w http.ResponseWriter, r *http.Request){
 			http.NotFound(w, r)
 			//~ fmt.Fprintf(w, "Something weird happened!\n")
 	} else {
-		fmt.Fprintf(w, "Status is %s!\n", healthStatus)	
+		fmt.Fprintf(w, "Status is %s!\n", healthStatus)
+		fmt.Printf("Failed to discover Redis Service. \n")	
 	}    	
 }
