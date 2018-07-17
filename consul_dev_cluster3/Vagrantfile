@@ -33,7 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # Modern App
-  config.vm.define "modern-app" do |ma|
+  config.vm.define "modernapp" do |ma|
       ma.vm.hostname = "modern"
       ma.vm.network "private_network", ip: "172.20.20.32"
       ma.vm.provision "shell", path: "scripts/golang.sh", run: "always"  
