@@ -2,15 +2,17 @@
 
 set -x
 
-which redis-server 2>/dev/null || {
+which nxinx 2>/dev/null || {
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
-  apt-get install -y redis-server redis-tools
-  sed -i 's/bind.*/bind 0.0.0.0/' /etc/redis/redis.conf
-  update-rc.d redis-server defaults
+  apt-get install -y nginx
+  
+  update-rc.d nginx defaults
 }
 
-/etc/init.d/redis-server status 2>/dev/null && /etc/init.d/redis-server force-reload 2>/dev/null || /etc/init.d/redis-server start 2>/dev/null
+cp /vagrant/etc/nginx/webapp_fe.conf /etc/nginx/sites-available/default
+
+/etc/init.d/nginx status &>/dev/null && /etc/init.d/nginx force-reload &>/dev/null || /etc/init.d/nginx start &>/dev/null
 
 # If service is not present in the /etc/consul.d folder creates a service file
 if [ ! -d "/etc/consul.d" ]; then
@@ -22,8 +24,7 @@ if [ ! -d "/etc/consul.d" ]; then
 fi
 
 #Copy Files
-cp /vagrant/etc/consul.d/redis* /etc/consul.d/
-	
+cp /vagrant/etc/consul.d/nginx* /etc/consul.d/
 
 which killall &>/dev/null || {
   export DEBIAN_FRONTEND=noninteractive

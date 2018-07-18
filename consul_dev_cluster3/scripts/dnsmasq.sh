@@ -15,10 +15,10 @@ if [ ! -f "/etc/dnsmasq.d/10-consul" ]; then
 	sudo chmod a+w /etc/dnsmasq.d	
 	
 	#Copy Files
-	cp /vagrant/etc/dnsmasq_consul.conf /etc/dnsmasq.d/10-consul
+	cp /vagrant/etc/dnsmasq/dnsmasq_consul.conf /etc/dnsmasq.d/10-consul
 	mv /etc/resolv.conf /etc/resolv.conf.orig
 	
-	sed -e '$s/$/\n/' -s /vagrant/etc/dnsmasq_resolv.conf /etc/resolv.conf.orig > /etc/resolv.conf
+	sed -e '$s/$/\n/' -s /vagrant/etc/dnsmasq/dnsmasq_resolv.conf /etc/resolv.conf.orig > /etc/resolv.conf
 	
 	cat /etc/resolv.conf
 	

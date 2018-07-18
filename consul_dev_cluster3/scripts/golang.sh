@@ -64,7 +64,7 @@ if [ ! -d "/etc/consul.d" ]; then
 fi
 
 #Copy Files
-cp /vagrant/etc/webapp* /etc/consul.d/
+cp /vagrant/etc/consul.d/webapp* /etc/consul.d/
 
 # Instaling required packaged for the app
 go get -u github.com/hashicorp/consul/api
