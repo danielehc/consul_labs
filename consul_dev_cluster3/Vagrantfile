@@ -24,7 +24,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
-
   # Redis Server
   config.vm.define "redis-server" do |rs|
       rs.vm.hostname = "redis"

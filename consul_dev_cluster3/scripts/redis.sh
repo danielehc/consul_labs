@@ -13,16 +13,17 @@ which redis-server 2>/dev/null || {
 /etc/init.d/redis-server status 2>/dev/null && /etc/init.d/redis-server force-reload 2>/dev/null || /etc/init.d/redis-server start 2>/dev/null
 
 # If service is not present in the /etc/consul.d folder creates a service file
-if [ ! -f "/etc/consul.d/redis.service.json" ] || [ ! -f "/etc/consul.d/redis.healthcheck.json" ]; then
+if [ ! -d "/etc/consul.d" ]; then
 	
 	# Creates folder
 	sudo mkdir -p /etc/consul.d
 	sudo chmod a+w /etc/consul.d	
-	
-	#Copy Files
-	cp /vagrant/etc/redis* /etc/consul.d/
-	
+
 fi
+
+#Copy Files
+cp /vagrant/etc/redis* /etc/consul.d/
+	
 
 which killall &>/dev/null || {
   export DEBIAN_FRONTEND=noninteractive

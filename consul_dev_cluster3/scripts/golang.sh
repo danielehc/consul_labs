@@ -47,18 +47,24 @@ fi
 export GOROOT=$INSTALL_PATH
 export PATH=$PATH:$GOROOT/bin
 
+# Healtcheck uses lynx command to check webervice
+which lynx &>/dev/null || {
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y lynx
+}
+
 # Registering the service
-# If service is not present in the /etc/consul.d folder creates a service file
-if [ ! -f "/etc/consul.d/webapp.service.json" ]; then
+# If /etc/consul.d folder does not exist creates it
+if [ ! -d "/etc/consul.d" ]; then
 	
 	# Creates folder
 	sudo mkdir -p /etc/consul.d
 	sudo chmod a+w /etc/consul.d	
-	
-	#Copy Files
-	cp /vagrant/etc/webapp* /etc/consul.d/
-	
 fi
+
+#Copy Files
+cp /vagrant/etc/webapp* /etc/consul.d/
 
 # Instaling required packaged for the app
 go get -u github.com/hashicorp/consul/api
@@ -70,10 +76,16 @@ which killall &>/dev/null || {
   apt-get install -y psmisc
 }
 
+# Make Consul re-load /etc/consul.d content
+killall -1 consul
+
+# Rebuild the application
 killall modern_app_web &>/dev/null
 pushd /usr/local/bin
 go build /vagrant/src/modern_app_web.go
-	
+
+# Output is redirected to a file to avoid application crash due to absence of a stdout
+# Logging is done on stdout due to “architectural decisions based on 12app interpretation”	
 /usr/local/bin/modern_app_web > app.log &
 sleep 1
 	
