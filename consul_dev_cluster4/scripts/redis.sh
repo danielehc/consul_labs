@@ -24,13 +24,13 @@ fi
 #Copy Files
 cp /vagrant/etc/consul.d/redis* /etc/consul.d/
 	
-
 which killall &>/dev/null || {
   export DEBIAN_FRONTEND=noninteractive
   apt-get update
   apt-get install -y psmisc
 }
 
+#reload consul
 killall -1 consul
 
 set +x

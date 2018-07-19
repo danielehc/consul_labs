@@ -23,33 +23,27 @@ which consul &>/dev/null || {
 	
     if [ -f "/vagrant/pkg/consul_${CONSUL_DEMO_VERSION}_linux_amd64.zip" ]; then
 			echo "Found Consul in /vagrant/pkg"
-			cp /vagrant/pkg/consul_${CONSUL_DEMO_VERSION}_linux_amd64.zip /tmp/consul.zip
     else
 			echo "Fetching Consul version ${CONSUL_DEMO_VERSION} ..."
-		
-			curl -s https://releases.hashicorp.com/consul/${CONSUL_DEMO_VERSION}/consul_${CONSUL_DEMO_VERSION}_linux_amd64.zip -o consul.zip
+			mkdir -p /vagrant/pkg/
+			curl -s https://releases.hashicorp.com/consul/${CONSUL_DEMO_VERSION}/consul_${CONSUL_DEMO_VERSION}_linux_amd64.zip -o /vagrant/pkg/consul_${CONSUL_DEMO_VERSION}_linux_amd64.zip
 		
 			if [ $? -ne 0 ]; then
 				echo "Download failed! Exiting."
 				exit 1
 			fi
-		
-			# Copying the archive in the /vagrant folder to reuse it for future provisionings or other VMs
-			mkdir -p /vagrant/pkg/
-			sudo cp consul.zip /vagrant/pkg/consul_${CONSUL_DEMO_VERSION}_linux_amd64.zip
+
 		fi
     
     echo "Installing Consul version ${CONSUL_DEMO_VERSION} ..."
-    unzip consul.zip
+	pushd /tmp
+    unzip /vagrant/pkg/consul_${CONSUL_DEMO_VERSION}_linux_amd64.zip 
     sudo chmod +x consul
     sudo mv consul /usr/local/bin/consul
 
     # https://www.consul.io/intro/getting-started/services.html
     sudo mkdir /etc/consul.d
     sudo chmod a+w /etc/consul.d
-
-    echo "Recovering some space ..."
-    sudo rm -rf /tmp/consul.zip
 }
 
 # If no consul-template binary we download one
@@ -64,15 +58,12 @@ which consul-template &> /dev/null || {
 	
 	echo $CONSUL_TEMPLATE_VERSION
 	
-	pushd /tmp/
-	
 	if [ -f "/vagrant/pkg/consul-template${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip" ]; then
 		echo "Found Consul-template in /vagrant/pkg"
-		cp /vagrant/pkg/consul-template${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip /tmp/consul-template.zip
   else
 		echo "Fetching Consul-template version ${CONSUL_TEMPLATE_VERSION} ..."
-		
-		curl -s https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip -o consul-template.zip
+		mkdir -p /vagrant/pkg/
+		curl -s https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip -o /vagrant/pkg/consul-template${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
 		
 		if [ $? -ne 0 ]; then
 			echo "Download failed! Exiting."
@@ -80,17 +71,14 @@ which consul-template &> /dev/null || {
 		fi
 		
 		# Copying the archive in the /vagrant folder to reuse it for future provisionings or other VMs
-		mkdir -p /vagrant/pkg/
-		sudo cp consul-template.zip /vagrant/pkg/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip	
+
 	fi
 	
 	echo "Installing Consul-template version ${CONSUL_TEMPLATE_VERSION} ..."
-  unzip consul-template.zip
+	pushd /tmp
+    unzip /vagrant/pkg/consul-template${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
 	sudo chmod +x consul-template
 	sudo mv consul-template /usr/local/bin/consul-template
-	
-	echo "Recovering some space ..."
-  sudo rm -rf /tmp/consul-template.zip
 	
 } 
 

@@ -16,14 +16,10 @@ which killall &>/dev/null || {
   apt-get install -y psmisc
 }
 
-#cp /vagrant/etc/nginx/webapp_fe.conf /etc/nginx/sites-available/default
-
 /etc/init.d/nginx status &>/dev/null && /etc/init.d/nginx force-reload &>/dev/null || /etc/init.d/nginx start &>/dev/null
 
 killall -1 consul-template &>/dev/null
-
 consul-template -template "/vagrant/etc/nginx/webapp_fe.ctmpl:/etc/nginx/sites-available/default:service nginx reload" &>consul-template.log &
-# consul-template -config /vagrant/etc/consul-template/consul-template.conf &>consul-template.log &
 
 # If service is not present in the /etc/consul.d folder creates a service file
 if [ ! -d "/etc/consul.d" ]; then
@@ -37,8 +33,7 @@ fi
 #Copy Files
 cp /vagrant/etc/consul.d/nginx* /etc/consul.d/
 
-
+#reload consul
 killall -1 consul
 
 set +x
-
