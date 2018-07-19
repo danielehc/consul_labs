@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SERVICE_URL="http://localhost:8080"
+SERVICE_URL="http://localhost:@@PORT@@"
 
 which lynx &> /dev/null || {
 	apt-get update

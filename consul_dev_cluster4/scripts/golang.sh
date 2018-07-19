@@ -54,7 +54,8 @@ which lynx &>/dev/null || {
   apt-get install -y lynx
 }
 
-RANDOM_PORT=`shuf -i 63000-65000 -n 1`
+#~ RANDOM_PORT=`shuf -i 63000-65000 -n 1`
+let RANDOM_PORT=1024+RANDOM
 
 # Registering the service
 # If /etc/consul.d folder does not exist creates it
@@ -67,6 +68,10 @@ fi
 
 #Copy Files
 cp /vagrant/etc/consul.d/webapp* /etc/consul.d/
+
+for i in `find /etc/consul.d/ -type f`; do
+	sed -i "s/@@PORT@@/${RANDOM_PORT}/g" $i
+done
 
 # Instaling required packaged for the app
 go get -u github.com/hashicorp/consul/api
@@ -88,7 +93,7 @@ go build /vagrant/src/modern_app_web.go
 
 # Output is redirected to a file to avoid application crash due to absence of a stdout
 # Logging is done on stdout due to “architectural decisions based on 12app interpretation”	
-/usr/local/bin/modern_app_web > app.log &
+/usr/local/bin/modern_app_web -port=${RANDOM_PORT} > app.log &
 sleep 1
 	
 set +x

@@ -4,6 +4,6 @@
       "tags": [
         "go-webapp"
       ],
-      "port": 8080
+      "port": @@PORT@@
     }
   }

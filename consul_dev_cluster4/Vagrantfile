@@ -31,15 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       rs.vm.provision "shell", path: "scripts/redis.sh", run: "always"                   
   end
 
-	# NGINX Server
-  config.vm.define "web01" do |web|
-      web.vm.hostname = "web01"
-      web.vm.network "private_network", ip: "172.20.20.22"
-      #ma.vm.provision "shell", path: "scripts/golang.sh", run: "always" 
-      web.vm.provision "shell", path: "scripts/nginx.sh", run: "always" 
-  end
-
-	# Modern App
+# Modern App
 	(1..2).each do |i|
     config.vm.define vm_name = "webapp0#{i}" do |ma|
         ma.vm.hostname = vm_name
@@ -48,6 +40,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
-
+	# NGINX Server
+  config.vm.define "web01" do |web|
+      web.vm.hostname = "web01"
+      web.vm.network "private_network", ip: "172.20.20.22"
+      #ma.vm.provision "shell", path: "scripts/golang.sh", run: "always" 
+      web.vm.provision "shell", path: "scripts/nginx.sh", run: "always" 
+  end
   
 end
