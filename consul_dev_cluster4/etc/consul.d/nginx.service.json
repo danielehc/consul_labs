@@ -1,0 +1,9 @@
+{
+    "service": {
+      "name": "nginx",
+      "tags": [
+        "webapp-frontend"
+      ],
+      "port": 80
+    }
+  }

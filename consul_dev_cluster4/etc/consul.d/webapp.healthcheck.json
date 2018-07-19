@@ -1,0 +1,9 @@
+{
+  "check": {
+    "id": "webapp-check",
+    "name": "Check Webapp",
+    "args": ["/etc/consul.d/webapp.healthcheck.1.sh"],
+    "interval": "10s",
+    "timeout": "1s"
+  }
+}

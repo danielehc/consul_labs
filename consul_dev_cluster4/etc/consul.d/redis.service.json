@@ -1,0 +1,9 @@
+{
+    "service": {
+      "name": "redis",
+      "tags": [
+        "redis-server"
+      ],
+      "port": 6379
+    }
+  }
