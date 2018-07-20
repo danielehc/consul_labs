@@ -2,19 +2,13 @@
 
 echo "Running the build script"
 
-COMMIT=${TRAVIS_COMMIT_MESSAGE}
-
-if [[ $COMMIT ]]; then
-
-	echo "Commit message is: ${COMMIT}"
-
-else
-
-	echo "Commit message isnot set"
-
+if [[ ! $BUILD_DIR ]]; then
+		SRC_DIR=consul_dev_cluster4
 fi
 
-#~ echo "Finding build folder"
+go get ./...
+go build ${SRC_DIR}/src/modern_app_web.go
 
+find . -name modern_app_web
 
 exit 0
