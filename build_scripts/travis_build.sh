@@ -9,7 +9,7 @@ if [[ ! $BUILD_DIR ]]; then
 fi
 
 # go get ./...
-go build ${SRC_DIR}/src/modern_app_web.go -O modern_app_web
+go build -o modern_app_web ${SRC_DIR}/src/modern_app_web.go 
 
 find . -name modern_app_web
 
