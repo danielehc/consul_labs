@@ -7,4 +7,4 @@ services:
 before_install:
 - echo hello before_install
 script:
-- echo hello script
+- bash build_scripts/travis_build.sh
