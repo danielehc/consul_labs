@@ -57,8 +57,8 @@ go get -u github.com/hashicorp/consul/api
 go get -u github.com/go-redis/redis
 
 # Running the app
-go run /vagrant/src/hello.go
-go run /vagrant/src/modern_app.go
+go run /vagrant/src/hello/hello.go
+go run /vagrant/src/modern_app/modern_app.go
 
 
 set +x
