@@ -1,7 +1,7 @@
 sudo: required
 language: go
 go:
-  - "1.10"
+- '1.10'
 services:
 - docker
 before_install:
@@ -9,5 +9,11 @@ before_install:
 script:
 - source build_scripts/travis.env
 - bash build_scripts/travis_build.sh
-
-
+deploy:
+  provider: releases
+  api_key:
+    secure: dHHaO8MYgwBu80UvDPUPhpntKXKRJ1MJsbrSUQkqG6GmaG0fTy0e6zTGO7/zGa/zvmkQcELpbY6sC+JLUpecQyjKW3IkxPNOQNqg4RY+v4Hcr+jnRG2X3+9jcWDFXCn/LYveFYIMucSBPZ8HYchgkyjQL4oVRB8C2bcu64KT9auCmAmfs2QAyCyREyKT9yjNAH5KcNLpedacqy8zNs98Y5xdIyORusm7HAnTnqWe07V/T+p5OKbdGJwfGgCytU6sPmcyE3Iq6jgOUj+wGN6ljrIl2bsBHEkQm25g4nPYpbPcwK/v2gqGDWc3uXvfLD7vnbkXEfBgGbg63zznWEk24hjUZOKCyqVx/REMHbGhGaY9JXHXRN6bmh1wv98M0B4wsp9lXwEYXehXbPzgAt6I6QSmmrredLZD2h1BfgUZ2aFVGhMsgZOgqe2xdeN14CB7OTJEe750btPSC/k/GFo4h/cEbAHfvk1HTQQAusBeDz7kqDbQ2AKSuipwvEl8miE9HquYU+MnFpW8RiP3PnC0F7s5NxW8Ktvu+MEQAk9eF6LdwVKiRJP7yJ+tEo02i0jic4dW9y64usb8+dQ3xVazEJKULzMVNLkzboytzEo6QnG3nME6C6yBzjVdN4+9Ys5mhlhCYUPsf/b5fh6uyV+ccXnjpJAzFBtgmFGCGNkjszo=
+  file: './modern_app_web'
+  on:
+    repo: danielehc/consul_labs
+    tags: true
