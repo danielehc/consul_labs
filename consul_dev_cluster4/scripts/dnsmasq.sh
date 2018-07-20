@@ -19,10 +19,6 @@ if [ ! -f "/etc/dnsmasq.d/10-consul" ]; then
 	mv /etc/resolv.conf /etc/resolv.conf.orig
 	
 	sed -e '$s/$/\n/' -s /vagrant/etc/dnsmasq/dnsmasq_resolv.conf /etc/resolv.conf.orig > /etc/resolv.conf
-	
-	cat /etc/resolv.conf
-	
-	#~ cat /vagrant/etc/dnsmasq_resolv.conf /etc/resolv.conf.orig > /etc/resolv.conf
 
 	service dnsmasq restart
 
