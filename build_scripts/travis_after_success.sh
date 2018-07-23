@@ -7,6 +7,8 @@ if [ -z "${TRAVIS_TAG}" ]; then
   exit 0
 fi
 
+env
+
 docker login -u $DOCKER_USER -p $DOCKER_PASS
 export REPO="danielehc/consul_labs"
 
