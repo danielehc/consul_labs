@@ -22,10 +22,10 @@ script:
 - go build -o modern_app_web ${SRC_DIR}/src/modern_app_web.go
 
 after_success:
- - if [  "${TRAVIS_TAG}" ]; then
-     docker build -f Dockerfile -t ${REPO}:${TRAVIS_TAG} -t ${REPO}:latest .
-     docker push ${REPO}
-   fi
+- if [  "${TRAVIS_TAG}" ]; then
+    docker build -f Dockerfile -t ${REPO}:${TRAVIS_TAG} -t ${REPO}:latest .
+    docker push ${REPO}
+  fi
 
 deploy:
   provider: releases
