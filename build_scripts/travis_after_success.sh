@@ -7,10 +7,10 @@ if [ -z "${TRAVIS_TAG}" ]; then
   exit 0
 fi
 
-docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-export REPO=danielehc/consul_labs/
+docker login -u $DOCKER_USER -p $DOCKER_PASS
+export REPO="danielehc/consul_labs"
 
-docker build -f Dockerfile -t $REPO .
+docker build -f Dockerfile -t ${REPO} .
 docker tag ${REPO} ${REPO}:${TRAVIS_TAG}
 docker tag ${REPO} ${REPO}:consul_labs-${TRAVIS_TAG}
 docker push ${REPO}
