@@ -29,11 +29,11 @@ vagrant up
 
 ## What are the labs doing
 
-* [Consul Dev Cluster 1] (consul_dev_cluster1)
+* ### Consul Dev Cluster 1
 
   Spins up a simple Consul cluster with 3 servers and 2 agents
 
-* [Consul Dev Cluster 2] (consul_dev_cluster2)
+* ### Consul Dev Cluster 2
 
   Spins up a Consul cluster with 3 servers and 3 agents. The 3 agents do the following:
 
@@ -41,7 +41,7 @@ vagrant up
   * **Agent 2:** Simple bash application incrementing a value in Redis
   * **Agent 3:** Simple Go (https://golang.org/) application incrementing a value in Redis
 
-* [Consul Dev Cluster 3] (consul_dev_cluster3)
+* ### Consul Dev Cluster 3
 
   Spins up a Consul cluster with 3 servers and 2 agents. The agents do the following:
 
@@ -50,7 +50,7 @@ vagrant up
     - Go web application (listening on port `8080`) incrementing a value in Redis everytime a page is visited. The application is registered in Consul as a service and an healthcheck is present.
     - NGINX (https://www.nginx.com/) acts as a reverse proxy for the Go web application. The web server is registered in Consul as a service and an healthcheck is present.
 
-* [Consul Dev Cluster 4] (https://github.com/danielehc/consul_labs/tree/master/consul_dev_cluster4)
+* ### Consul Dev Cluster 4
 
   Spins up a Consul cluster with 3 servers and 4 agents. The agents do the following:
 
