@@ -18,8 +18,8 @@ env:
 script:
 - go build -o modern_app_web ${SRC_DIR}/src/modern_app_web.go
 
-after_success: 
-- if [  "${TRAVIS_TAG}" ]; then
+after_success: |
+  if [  "${TRAVIS_TAG}" ]; then
     docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
     docker build -f Dockerfile -t ${REPO}:${TRAVIS_TAG} -t ${REPO}:latest .
     docker push ${REPO}
