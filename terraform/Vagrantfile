@@ -1,0 +1,22 @@
+# Vagrantfile API/syntax version.
+# NB: Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "danielec/stretch64"
+  
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+    v.cpus = 2
+    v.customize ["modifyvm", :id, "--groups", "/terraform"]
+  end
+
+  # Terraform
+  config.vm.define "terraform" do |rs|
+      rs.vm.hostname = "terraform"
+      rs.vm.network "private_network", ip: "10.10.10.10"
+      rs.vm.provision "shell", path: "scripts/terraform.sh", run: "always"     
+      rs.vm.provision "shell", path: "scripts/azure_cli.sh", run: "always"              
+  end
+
+end

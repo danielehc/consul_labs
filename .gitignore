@@ -1,2 +1,7 @@
 .vagrant/
+.terraform/
 pkg/
+doc/
+priv/
+terraform.plan
+terraform.tfstate*
