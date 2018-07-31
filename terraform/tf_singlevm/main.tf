@@ -70,7 +70,7 @@ resource "azurerm_public_ip" "terraformpublicip" {
   public_ip_address_allocation = "dynamic"
 
   tags {
-    environment = "Terraform Demo"
+    environment = "${var.prefix} Terraform Demo"
   }
 }
 
@@ -93,7 +93,7 @@ resource "azurerm_network_security_group" "terraformnsg" {
   }
 
   tags {
-    environment = "Terraform Demo"
+    environment = "${var.prefix} Terraform Demo"
   }
 }
 
