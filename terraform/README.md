@@ -43,18 +43,24 @@ The idea is to replicate the last consul_lab in the repository in Azure (and hop
   * Add a file called `azure.env` to it with the following content:
 
     ```bash
+    
+    #project prefix
+    export TF_VAR_prefix=daniele
+
+    #Azure creds
     export ARM_SUBSCRIPTION_ID=your_subscription_id
     export ARM_CLIENT_ID=your_appId
     export ARM_CLIENT_SECRET=your_password
     export ARM_TENANT_ID=your_tenant_id
     
+    #Terraform variables
     export TF_VAR_ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}
     export TF_VAR_ARM_CLIENT_ID=${ARM_CLIENT_ID}
     export TF_VAR_ARM_CLIENT_SECRET=${ARM_CLIENT_SECRET}
     export TF_VAR_ARM_TENANT_ID=${ARM_TENANT_ID}
     ```
 
-    The values to assign to the variables can be obtained following steps listed in https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-install-configure
+    run `az login` and then follow the steps listed in https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-install-configure
 
 ## Getting started
 
