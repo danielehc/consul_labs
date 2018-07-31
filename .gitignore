@@ -5,3 +5,12 @@ doc/
 priv/
 terraform.plan
 terraform.tfstate*
+.terraform.tfstate*
+
+# Terraform Variables
+*.tfvars
+# SSH Keys
+*.pem
+
+single-region/
+multi-region/

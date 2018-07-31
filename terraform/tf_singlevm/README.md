@@ -69,7 +69,7 @@ Once cloned the repository you can use the following steps to spin up the enviro
   This will make you login into the machine where now the environment is ready to use Terraform.
 
   ```bash
-  $ cd /vagrant/[project_folder]
+  $ cd /vagrant
   $ terraform fmt
   $ terraform init
   $ terraform plan -out terraform.plan
