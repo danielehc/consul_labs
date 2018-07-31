@@ -1,6 +1,7 @@
 # Create a VM
-variable "resourcename" {
-  default = "danieleResourceGroup"
+
+variable "prefix" {
+  default = "daniele"
 }
 
 variable "ARM_SUBSCRIPTION_ID" {
@@ -32,40 +33,40 @@ provider "azurerm" {
 }
 
 # Create a resource group if it doesn’t exist
-resource "azurerm_resource_group" "danieleterraformgroup" {
-  name     = "danieleResourceGroup"
+resource "azurerm_resource_group" "terraformgroup" {
+  name     = "${var.prefix}ResourceGroup"
   location = "eastus"
 
   tags {
-    environment = "Daniele Terraform Demo"
+    environment = "${var.prefix} Terraform Demo"
   }
 }
 
 # Create virtual network
-resource "azurerm_virtual_network" "danieleterraformnetwork" {
-  name                = "danieleVnet"
+resource "azurerm_virtual_network" "terraformnetwork" {
+  name                = "${var.prefix}VNet"
   address_space       = ["10.0.0.0/16"]
   location            = "eastus"
-  resource_group_name = "${azurerm_resource_group.danieleterraformgroup.name}"
+  resource_group_name = "${azurerm_resource_group.terraformgroup.name}"
 
   tags {
-    environment = "Terraform Demo"
+    environment = "${var.prefix} Terraform Demo"
   }
 }
 
 # Create subnet
-resource "azurerm_subnet" "danieleterraformsubnet" {
-  name                 = "danieleSubnet"
-  resource_group_name  = "${azurerm_resource_group.danieleterraformgroup.name}"
-  virtual_network_name = "${azurerm_virtual_network.danieleterraformnetwork.name}"
+resource "azurerm_subnet" "terraformsubnet" {
+  name                 = "${var.prefix}Subnet"
+  resource_group_name  = "${azurerm_resource_group.terraformgroup.name}"
+  virtual_network_name = "${azurerm_virtual_network.terraformnetwork.name}"
   address_prefix       = "10.0.1.0/24"
 }
 
 # Create public IPs
-resource "azurerm_public_ip" "danieleterraformpublicip" {
-  name                         = "danielePublicIP"
+resource "azurerm_public_ip" "terraformpublicip" {
+  name                         = "${var.prefix}PublicIP"
   location                     = "eastus"
-  resource_group_name          = "${azurerm_resource_group.danieleterraformgroup.name}"
+  resource_group_name          = "${azurerm_resource_group.terraformgroup.name}"
   public_ip_address_allocation = "dynamic"
 
   tags {
@@ -74,10 +75,10 @@ resource "azurerm_public_ip" "danieleterraformpublicip" {
 }
 
 # Create Network Security Group and rule
-resource "azurerm_network_security_group" "danieleterraformnsg" {
-  name                = "danieleNetworkSecurityGroup"
+resource "azurerm_network_security_group" "terraformnsg" {
+  name                = "${var.prefix}NetworkSecurityGroup"
   location            = "eastus"
-  resource_group_name = "${azurerm_resource_group.danieleterraformgroup.name}"
+  resource_group_name = "${azurerm_resource_group.terraformgroup.name}"
 
   security_rule {
     name                       = "SSH"
@@ -97,21 +98,21 @@ resource "azurerm_network_security_group" "danieleterraformnsg" {
 }
 
 # Create network interface
-resource "azurerm_network_interface" "danieleterraformnic" {
-  name                      = "danieleNIC"
+resource "azurerm_network_interface" "terraformnic" {
+  name                      = "${var.prefix}NIC"
   location                  = "eastus"
-  resource_group_name       = "${azurerm_resource_group.danieleterraformgroup.name}"
-  network_security_group_id = "${azurerm_network_security_group.danieleterraformnsg.id}"
+  resource_group_name       = "${azurerm_resource_group.terraformgroup.name}"
+  network_security_group_id = "${azurerm_network_security_group.terraformnsg.id}"
 
   ip_configuration {
-    name                          = "danieleNicConfiguration"
-    subnet_id                     = "${azurerm_subnet.danieleterraformsubnet.id}"
+    name                          = "${var.prefix}NicConfiguration"
+    subnet_id                     = "${azurerm_subnet.terraformsubnet.id}"
     private_ip_address_allocation = "dynamic"
-    public_ip_address_id          = "${azurerm_public_ip.danieleterraformpublicip.id}"
+    public_ip_address_id          = "${azurerm_public_ip.terraformpublicip.id}"
   }
 
   tags {
-    environment = "Terraform Demo"
+    environment = "${var.prefix} Terraform Demo"
   }
 }
 
@@ -119,35 +120,35 @@ resource "azurerm_network_interface" "danieleterraformnic" {
 resource "random_id" "randomId" {
   keepers = {
     # Generate a new ID only when a new resource group is defined
-    resource_group = "${azurerm_resource_group.danieleterraformgroup.name}"
+    resource_group = "${azurerm_resource_group.terraformgroup.name}"
   }
 
   byte_length = 8
 }
 
 # Create storage account for boot diagnostics
-resource "azurerm_storage_account" "danielestorageaccount" {
+resource "azurerm_storage_account" "storageaccount" {
   name                     = "diag${random_id.randomId.hex}"
-  resource_group_name      = "${azurerm_resource_group.danieleterraformgroup.name}"
+  resource_group_name      = "${azurerm_resource_group.terraformgroup.name}"
   location                 = "eastus"
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
   tags {
-    environment = "Terraform Demo"
+    environment = "${var.prefix} Terraform Demo"
   }
 }
 
 # Create virtual machine
-resource "azurerm_virtual_machine" "danieleterraformvm" {
-  name                  = "danieleVM"
+resource "azurerm_virtual_machine" "terraformvm" {
+  name                  = "${var.prefix}VM"
   location              = "eastus"
-  resource_group_name   = "${azurerm_resource_group.danieleterraformgroup.name}"
-  network_interface_ids = ["${azurerm_network_interface.danieleterraformnic.id}"]
+  resource_group_name   = "${azurerm_resource_group.terraformgroup.name}"
+  network_interface_ids = ["${azurerm_network_interface.terraformnic.id}"]
   vm_size               = "Standard_DS1_v2"
 
   storage_os_disk {
-    name              = "danieleOsDisk"
+    name              = "${var.prefix}OsDisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Premium_LRS"
@@ -161,7 +162,7 @@ resource "azurerm_virtual_machine" "danieleterraformvm" {
   }
 
   os_profile {
-    computer_name  = "danielevm"
+    computer_name  = "${var.prefix}vm"
     admin_username = "azureuser"
   }
 
@@ -176,11 +177,11 @@ resource "azurerm_virtual_machine" "danieleterraformvm" {
 
   boot_diagnostics {
     enabled     = "true"
-    storage_uri = "${azurerm_storage_account.danielestorageaccount.primary_blob_endpoint}"
+    storage_uri = "${azurerm_storage_account.storageaccount.primary_blob_endpoint}"
   }
 
   tags {
-    environment = "Terraform Demo"
+    environment = "${var.prefix} Terraform Demo"
   }
 }
 
