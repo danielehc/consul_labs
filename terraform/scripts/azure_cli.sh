@@ -27,35 +27,15 @@ if [ -f "/vagrant/priv/azure.env" ]; then
 
 	echo "Exporting Environment Variables for AZURE"
 	touch "/etc/bash.bashrc"
-	{
-			cat /vagrant/priv/azure.env
-	} >> "/etc/bash.bashrc"
+	grep /azure.env /etc/bash.bashrc || {
+          echo source /vagrant/priv/azure.env | sudo tee -a /etc/bash.bashrc
+        }
 
 else
 
-	echo "No Environment Variables file found forAZURE"
+	echo "No Environment Variables file found for AZURE"
 	echo "Please follow steps listed at https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-install-configure"
 
 fi
-
-# To be able to connect to the Azure VMs we will need to setup a SSH key pair
-# The public key will be used to configure the VMs
-# To avoid changing the values all the time at startup we check if we have such pair stored
-# in the /vagrant/priv folder, if not we create it and save the configuration
-# for next provision.
-
-if [ ! -f "/vagrant/priv/id_rsa" ] || [ ! -f "/vagrant/priv/id_rsa.pub" ]; then
-	ssh-keygen -b 2048 -t rsa -f /vagrant/priv/id_rsa -q -N ""
-fi
-
-cp /vagrant/priv/id_rsa* /home/vagrant/.ssh/
-
-PUB_KEY=`cat /vagrant/priv/id_rsa.pub | awk '{print $1" "$2}'`
-
-touch "/etc/bash.bashrc"
-{
-		echo "export TF_VAR_SSH_KEY_DATA='${PUB_KEY}'"
-} >> "/etc/bash.bashrc"
-
 
 set +x

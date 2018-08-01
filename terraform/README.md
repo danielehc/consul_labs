@@ -38,6 +38,8 @@ The idea is to replicate the last consul_lab in the repository in Azure (and hop
 
   So before using the environment you should:
 
+  * Create an ssh key like `ssh-keygen -t rsa` and check the pub key
+
   * Create a folder called `priv` 
 
   * Add a file called `azure.env` to it with the following content:
@@ -46,6 +48,9 @@ The idea is to replicate the last consul_lab in the repository in Azure (and hop
     
     #project prefix
     export TF_VAR_prefix=daniele
+
+    #ssh pubkey
+    export TF_VAR_SSH_KEY_DATA=ssh_pub_key
 
     #Azure creds
     export ARM_SUBSCRIPTION_ID=your_subscription_id
