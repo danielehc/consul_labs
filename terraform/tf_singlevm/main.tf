@@ -216,7 +216,7 @@ resource "azurerm_virtual_machine" "terraformvm" {
 
 data "azurerm_public_ip" "terraformpublicip" {
   name                = "${azurerm_public_ip.terraformpublicip.name}"
-  resource_group_name = "${azurerm_virtual_machine.terraformvm.resource_group_name}"
+  resource_group_name = "${var.prefix}ResourceGroup"
 }
 
 output "machine_public_ip" {
