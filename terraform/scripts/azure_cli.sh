@@ -38,4 +38,14 @@ else
 
 fi
 
+if [ ! -f "/vagrant/priv/id_rsa" ] || [ ! -f "/vagrant/priv/id_rsa.pub" ]; then
+	ssh-keygen -b 2048 -t rsa -f /vagrant/priv/id_rsa -q -N ""
+        cp /vagrant/priv/id_rsa* /home/vagrant/.ssh/
+fi
+
+grep TF_VAR_SSH_KEY_DATA /etc/bash.bashrc || {
+	PUB_KEY=`cat /vagrant/priv/id_rsa.pub | awk '{print $1" "$2}'`
+	echo "export TF_VAR_SSH_KEY_DATA='${PUB_KEY}'" | sudo tee -a "/etc/bash.bashrc"
+}
+
 set +x
