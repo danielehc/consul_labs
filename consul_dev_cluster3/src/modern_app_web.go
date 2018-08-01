@@ -41,12 +41,8 @@ func main() {
 	
 	// Define paths
 	
-	templates = template.Must(template.ParseGlob("/vagrant/templates/*.html"))
-	
-	//~ http.Handle("/", http.FileServer(http.Dir("/vagrant/templates")))
-		
 	http.HandleFunc("/health/", healthHandler)
-  http.HandleFunc("/", indexHandler)
+    http.HandleFunc("/", indexHandler)
 	
 	// Register service with Consul
 	
