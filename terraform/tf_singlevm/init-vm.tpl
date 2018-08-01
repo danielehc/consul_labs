@@ -4,14 +4,6 @@ set -x
 
 exec > >(tee /var/log/user-data.log) 2>&1
 
-if [ -z "${consul_datacenter}" ]; then
-    echo "No consul_datacenter passed, printing default"
-else
-    echo "Consul Datacenter: ${consul_datacenter}"
-    echo "Now doing serious stuff.."
-fi
-
-
 # The VM should already have these tools but in case theey are not 
 # there we reinstall them
 which unzip curl jq route &>/dev/null || {
@@ -22,18 +14,26 @@ which unzip curl jq route &>/dev/null || {
     sudo apt-get clean
 }
 
+AZURE_INSTANCE_METADATA_URL="http://169.254.169.254/metadata/instance?api-version=2017-08-01"
+
+function lookup_path_in_instance_metadata {
+    curl --silent --show-error --header Metadata:true --location "$AZURE_INSTANCE_METADATA_URL" | jq -r "$1"
+}
+
+function get_instance_ip_address {
+    lookup_path_in_instance_metadata ".network.interface[0].ipv4.ipAddress[0].privateIpAddress"
+}
+
+if [  "${consul_datacenter}" ]; then
+    echo "Consul Datacenter: ${consul_datacenter}"
+fi
+
 #if no consul binary we download one
 which consul &>/dev/null || {
     echo "Determining Consul version to install ..."
 
-    CHECKPOINT_URL="https://checkpoint-api.hashicorp.com/v1/check"
-    if [ -z "${consul_version}" ]; then
-        CONSUL_VERSION=$(curl -s "$${CHECKPOINT_URL}"/consul | jq .current_version | tr -d '"')
-    else
-        CONSUL_VERSION=${consul_version}
-    fi
+    CONSUL_VERSION=${consul_version}
 
-	
 	pushd /tmp/
 	
     echo "Fetching Consul version $${CONSUL_VERSION} ..."
@@ -51,28 +51,23 @@ which consul &>/dev/null || {
     sudo chmod +x consul
     sudo mv consul /usr/local/bin/consul
 
-    # https://www.consul.io/intro/getting-started/services.html
-    sudo mkdir /etc/consul.d
+    sudo mkdir -p /etc/consul.d
     sudo chmod a+w /etc/consul.d
-
-    echo "/usr/local/bin/consul --version: $(/usr/local/bin/consul --version)"
-
-#     # Write base client Consul config
-#     sudo tee /etc/consul.d/consul-default.json <<EOF
-#     {
-#     "advertise_addr": "$${local_ipv4}",
-#     "data_dir": "/opt/consul/data",
-#     "client_addr": "0.0.0.0",
-#     "log_level": "INFO",
-#     "ui": true,
-#     "retry_join": ["provider=azure tag_name=consul_datacenter tag_value=${consul_datacenter} subscription_id=${auto_join_subscription_id} tenant_id=${auto_join_tenant_id} client_id=${auto_join_client_id} secret_access_key=${auto_join_secret_access_key}"]
-#     }
-# EOF
-
 
 }
 
+echo "/usr/local/bin/consul --version"
+/usr/local/bin/consul --version
 
-
+# Write base client Consul config
+sudo tee /etc/consul.d/consul-default.json <<EOF
+{
+"advertise_addr": "`get_instance_ip_address`",
+"data_dir": "/opt/consul/data",
+"client_addr": "0.0.0.0",
+"log_level": "INFO",
+"ui": true
+}
+EOF
 
 set +x

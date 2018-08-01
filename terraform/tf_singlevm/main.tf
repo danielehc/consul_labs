@@ -4,8 +4,8 @@ variable "prefix" {
   default = "daniele"
 }
 
-variable "consul_datacenter" {
-  default = "consuldc"
+variable "datacenter" {
+  default = "eastus"
 }
 
 variable "consul_version" {
@@ -44,7 +44,7 @@ provider "azurerm" {
 # Create a resource group if it doesn’t exist
 resource "azurerm_resource_group" "terraformgroup" {
   name     = "${var.prefix}ResourceGroup"
-  location = "eastus"
+  location = "${var.datacenter}"
 
   tags {
     environment = "${var.prefix} Terraform Demo"
@@ -55,7 +55,7 @@ resource "azurerm_resource_group" "terraformgroup" {
 resource "azurerm_virtual_network" "terraformnetwork" {
   name                = "${var.prefix}VNet"
   address_space       = ["10.0.0.0/16"]
-  location            = "eastus"
+  location            = "${var.datacenter}"
   resource_group_name = "${azurerm_resource_group.terraformgroup.name}"
 
   tags {
@@ -74,7 +74,7 @@ resource "azurerm_subnet" "terraformsubnet" {
 # Create public IPs
 resource "azurerm_public_ip" "terraformpublicip" {
   name                         = "${var.prefix}PublicIP"
-  location                     = "eastus"
+  location                     = "${var.datacenter}"
   resource_group_name          = "${azurerm_resource_group.terraformgroup.name}"
   public_ip_address_allocation = "dynamic"
 
@@ -86,7 +86,7 @@ resource "azurerm_public_ip" "terraformpublicip" {
 # Create Network Security Group and rule
 resource "azurerm_network_security_group" "terraformnsg" {
   name                = "${var.prefix}NetworkSecurityGroup"
-  location            = "eastus"
+  location            = "${var.datacenter}"
   resource_group_name = "${azurerm_resource_group.terraformgroup.name}"
 
   security_rule {
@@ -109,7 +109,7 @@ resource "azurerm_network_security_group" "terraformnsg" {
 # Create network interface
 resource "azurerm_network_interface" "terraformnic" {
   name                      = "${var.prefix}NIC"
-  location                  = "eastus"
+  location                  = "${var.datacenter}"
   resource_group_name       = "${azurerm_resource_group.terraformgroup.name}"
   network_security_group_id = "${azurerm_network_security_group.terraformnsg.id}"
 
@@ -139,7 +139,7 @@ resource "random_id" "randomId" {
 resource "azurerm_storage_account" "storageaccount" {
   name                     = "diag${random_id.randomId.hex}"
   resource_group_name      = "${azurerm_resource_group.terraformgroup.name}"
-  location                 = "eastus"
+  location                 = "${var.datacenter}"
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
@@ -148,10 +148,20 @@ resource "azurerm_storage_account" "storageaccount" {
   }
 }
 
+# here we add consul
+data "template_file" "init" {
+  template = "${file("./init-vm.tpl")}"
+
+  vars = {
+    consul_version    = "${var.consul_version}"
+    consul_datacenter = "${var.prefix}-${var.datacenter}"
+  }
+}
+
 # Create virtual machine
 resource "azurerm_virtual_machine" "terraformvm" {
   name                  = "${var.prefix}VM"
-  location              = "eastus"
+  location              = "${var.datacenter}"
   resource_group_name   = "${azurerm_resource_group.terraformgroup.name}"
   network_interface_ids = ["${azurerm_network_interface.terraformnic.id}"]
   vm_size               = "Standard_DS1_v2"
@@ -191,22 +201,8 @@ resource "azurerm_virtual_machine" "terraformvm" {
   }
 
   tags {
-    environment       = "${var.prefix} Terraform Demo"
-    consul_datacenter = "${var.prefix}-${var.consul_datacenter}"
-  }
-}
-
-# here we will add a consul cluster
-data "template_file" "init" {
-  template = "${file("./init-vm.tpl")}"
-
-  vars = {
-    consul_version              = "${var.consul_version}"
-    consul_datacenter           = "${var.prefix}-${var.consul_datacenter}"
-    auto_join_subscription_id   = "${var.ARM_SUBSCRIPTION_ID}"
-    auto_join_tenant_id         = "${var.ARM_TENANT_ID}"
-    auto_join_client_id         = "${var.ARM_CLIENT_ID}"
-    auto_join_secret_access_key = "${var.ARM_CLIENT_SECRET}"
+    environment = "${var.prefix} Terraform Demo"
+    datacenter  = "${var.prefix}-${var.datacenter}"
   }
 }
 
@@ -218,6 +214,11 @@ data "template_file" "init" {
 # will add our binary
 # will run the binary
 
+data "azurerm_public_ip" "terraformpublicip" {
+  name                = "${azurerm_public_ip.terraformpublicip.name}"
+  resource_group_name = "${azurerm_virtual_machine.terraformvm.resource_group_name}"
+}
+
 output "machine_public_ip" {
-  value = "${format("IP: %s", azurerm_public_ip.terraformpublicip.ip_address)}"
+  value = "${format("ssh azureuser@%s", azurerm_public_ip.terraformpublicip.ip_address)}"
 }

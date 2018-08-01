@@ -40,7 +40,13 @@ fi
 
 if [ ! -f "/vagrant/priv/id_rsa" ] || [ ! -f "/vagrant/priv/id_rsa.pub" ]; then
 	ssh-keygen -b 2048 -t rsa -f /vagrant/priv/id_rsa -q -N ""
+fi
+
+if [ ! -f "/home/vagrant/.ssh/id_rsa" ] || [ ! -f "/home/vagrant/.ssh/id_rsa.pub" ]; then
         cp /vagrant/priv/id_rsa* /home/vagrant/.ssh/
+	chown -R vagrant:vagrant /home/vagrant/.ssh
+	chmod -R 0600 /home/vagrant/.ssh 
+	chmod 0700 /home/vagrant/.ssh 
 fi
 
 grep TF_VAR_SSH_KEY_DATA /etc/bash.bashrc || {
