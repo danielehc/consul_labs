@@ -4,6 +4,15 @@ variable "prefix" {
   default = "daniele"
 }
 
+variable "consul_datacenter" {
+  default = "consuldc"
+}
+
+variable "consul_version" {
+  default     = "1.2.2"
+  description = "The Consul version to install on agents"
+}
+
 variable "ARM_SUBSCRIPTION_ID" {
   description = "The Azure subscription ID"
 }
@@ -182,7 +191,8 @@ resource "azurerm_virtual_machine" "terraformvm" {
   }
 
   tags {
-    environment = "${var.prefix} Terraform Demo"
+    environment       = "${var.prefix} Terraform Demo"
+    consul_datacenter = "${var.prefix}-${var.consul_datacenter}"
   }
 }
 
@@ -191,7 +201,8 @@ data "template_file" "init" {
   template = "${file("./init-vm.tpl")}"
 
   vars = {
-    text_variable               = "Hello World"
+    consul_version              = "${var.consul_version}"
+    consul_datacenter           = "${var.prefix}-${var.consul_datacenter}"
     auto_join_subscription_id   = "${var.ARM_SUBSCRIPTION_ID}"
     auto_join_tenant_id         = "${var.ARM_TENANT_ID}"
     auto_join_client_id         = "${var.ARM_CLIENT_ID}"
