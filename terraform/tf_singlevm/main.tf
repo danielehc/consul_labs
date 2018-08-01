@@ -164,6 +164,7 @@ resource "azurerm_virtual_machine" "terraformvm" {
   os_profile {
     computer_name  = "${var.prefix}vm"
     admin_username = "azureuser"
+    custom_data    = "${base64encode(data.template_file.init.rendered)}"
   }
 
   os_profile_linux_config {
@@ -186,14 +187,26 @@ resource "azurerm_virtual_machine" "terraformvm" {
 }
 
 # here we will add a consul cluster
+data "template_file" "init" {
+  template = "${file("./init-vm.tpl")}"
 
+  vars = {
+    text_variable               = "Hello World"
+    auto_join_subscription_id   = "${var.ARM_SUBSCRIPTION_ID}"
+    auto_join_tenant_id         = "${var.ARM_TENANT_ID}"
+    auto_join_client_id         = "${var.ARM_CLIENT_ID}"
+    auto_join_secret_access_key = "${var.ARM_CLIENT_SECRET}"
+  }
+}
 
 # here we will do a redis
 # we can do VM or see if there is Redis as a service
 # register service in consul
 
-
 # here we will do a VM
 # will add our binary
 # will run the binary
 
+output "machine_public_ip" {
+  value = "${format("IP: %s", azurerm_public_ip.terraformpublicip.ip_address)}"
+}
