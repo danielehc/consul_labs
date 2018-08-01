@@ -36,6 +36,12 @@ The idea is to replicate the last consul_lab in the repository in Azure (and hop
   fi
   ```
 
+### SSH
+
+The `script/azure_cli.sh` script will create a ssh key in /vagrant/priv/id_rsa and will setup the environment to use it.
+
+### Variables
+
   So before using the environment you should:
 
   * Create a folder called `priv` 
