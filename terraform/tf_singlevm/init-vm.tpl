@@ -56,7 +56,7 @@ which consul &>/dev/null || {
 
 }
 
-echo "/usr/local/bin/consul --version"
+# echo "/usr/local/bin/consul --version"
 /usr/local/bin/consul --version
 
 # Write base client Consul config
@@ -69,5 +69,19 @@ sudo tee /etc/consul.d/consul-default.json <<EOF
 "ui": true
 }
 EOF
+
+if [ "${consul_mode}" == "server" ]; then 
+  # Write base server Consul config
+  echo "Seems we are in a server - Consul mode is: ${consul_mode}"
+  sudo tee /etc/consul.d/consul-server.json <<EOF
+  {
+    "server": true,
+    "bootstrap_expect": ${cluster_size}
+  }
+EOF
+
+fi
+
+/usr/local/bin/consul agent -config-dir /etc/consul.d > /var/log/consul.log &
 
 set +x

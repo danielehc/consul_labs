@@ -13,6 +13,16 @@ variable "consul_version" {
   description = "The Consul version to install on agents"
 }
 
+variable "consul_mode" {
+  default     = "agent"
+  description = "Describes the mode to start Conul on, if server, starts Consul as a server."
+}
+
+variable "cluster_size" {
+  default     = "1"
+  description = "Number of Consul servers to expect in the cluster"
+}
+
 variable "ARM_SUBSCRIPTION_ID" {
   description = "The Azure subscription ID"
 }
@@ -155,6 +165,8 @@ data "template_file" "init" {
   vars = {
     consul_version    = "${var.consul_version}"
     consul_datacenter = "${var.prefix}-${var.datacenter}"
+    consul_mode       = "server"
+    cluster_size      = "${var.cluster_size}"
   }
 }
 
