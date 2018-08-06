@@ -51,6 +51,8 @@ which consul &>/dev/null || {
     sudo chmod +x consul
     sudo mv consul /usr/local/bin/consul
 
+    rm -rf /tmp/consul_$${CONSUL_VERSION}_linux_amd64.zip 
+
     sudo mkdir -p /etc/consul.d
     sudo chmod a+w /etc/consul.d
 
@@ -62,7 +64,7 @@ which consul &>/dev/null || {
 # Write base client Consul config
 sudo tee /etc/consul.d/consul-default.json <<EOF
 {
-"advertise_addr": "`get_instance_ip_address`",
+"bind_addr": "`get_instance_ip_address`",
 "data_dir": "/opt/consul/data",
 "client_addr": "0.0.0.0",
 "log_level": "INFO",
@@ -83,5 +85,104 @@ EOF
 fi
 
 /usr/local/bin/consul agent -config-dir /etc/consul.d > /var/log/consul.log &
+
+# Install Redis
+
+which redis-server 2>/dev/null || {
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y redis-server redis-tools
+  sed -i 's/bind.*/bind 0.0.0.0/' /etc/redis/redis.conf
+  update-rc.d redis-server defaults
+}
+
+/etc/init.d/redis-server status 2>/dev/null && /etc/init.d/redis-server force-reload 2>/dev/null || /etc/init.d/redis-server start 2>/dev/null
+
+# If service is not present in the /etc/consul.d folder creates a service file
+if [ ! -d "/etc/consul.d" ]; then
+	
+	# Creates folder
+	sudo mkdir -p /etc/consul.d
+	sudo chmod a+w /etc/consul.d	
+
+fi
+
+# Write redis service Consul config
+sudo tee /etc/consul.d/redis.service.json <<EOF
+  {
+    "service": {
+      "name": "redis",
+      "tags": [
+        "redis-server"
+      ],
+      "port": 6379
+    }
+  }
+EOF
+
+# Write redis service healthcheck  Consul config
+sudo tee /etc/consul.d/redis.healthcheck.json <<EOF
+  {
+  "check": {
+    "id": "redis-ping",
+    "name": "Ping Redis",
+    "args": ["redis-cli", "ping"],
+    "interval": "10s",
+    "timeout": "1s"
+    }
+}
+EOF
+
+which killall &>/dev/null || {
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y psmisc
+}
+
+#reload consul
+killall -1 consul
+
+
+# # Download my application
+# # Run
+
+if [ "${webapp_release}" == "latest" ]; then
+    sudo curl -sL `curl -s https://api.github.com/repos/danielehc/consul_labs/releases/latest | jq .assets[0].browser_download_url | sed 's/"//g'` -o /usr/local/bin/modern_app_web
+else
+    sudo curl -sL `curl -s https://api.github.com/repos/danielehc/consul_labs/releases/tags/${webapp_release} | jq .assets[0].browser_download_url | sed 's/"//g'` -o /usr/local/bin/modern_app_web
+fi
+
+if [ $? -ne 0 ]; then
+    echo "Download failed! Exiting."
+    exit 1
+fi
+
+chmod +x /usr/local/bin/modern_app_web
+
+/usr/local/bin/modern_app_web > /var/log/webapp.log &
+
+sleep 1
+
+# Write webapp service Consul config
+sudo tee /etc/consul.d/webapp.service.json <<EOF
+  {
+    "service": {
+      "name": "webapp",
+      "tags": [
+        "go-webapp"
+      ],
+      "port": 8080
+    }
+  }
+EOF
+
+which killall &>/dev/null || {
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y psmisc
+}
+
+#reload consul
+killall -1 consul
 
 set +x

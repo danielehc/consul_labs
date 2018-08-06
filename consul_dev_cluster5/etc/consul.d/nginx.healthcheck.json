@@ -1,0 +1,9 @@
+{
+  "check": {
+    "id": "nginx-check",
+    "name": "Check Nginx FE for Webapp",
+    "args": ["/etc/consul.d/nginx.healthcheck.1.sh"],
+    "interval": "10s",
+    "timeout": "1s"
+  }
+}

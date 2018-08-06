@@ -23,6 +23,11 @@ variable "cluster_size" {
   description = "Number of Consul servers to expect in the cluster"
 }
 
+variable "webapp_release" {
+  default     = "latest"
+  description = "Release of the webapp to download and execute"
+}
+
 variable "ARM_SUBSCRIPTION_ID" {
   description = "The Azure subscription ID"
 }
@@ -111,6 +116,30 @@ resource "azurerm_network_security_group" "terraformnsg" {
     destination_address_prefix = "*"
   }
 
+  security_rule {
+    name                       = "Consul"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8500"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "Webapp"
+    priority                   = 1003
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "8080"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
   tags {
     environment = "${var.prefix} Terraform Demo"
   }
@@ -167,6 +196,7 @@ data "template_file" "init" {
     consul_datacenter = "${var.prefix}-${var.datacenter}"
     consul_mode       = "server"
     cluster_size      = "${var.cluster_size}"
+    webapp_release    = "${var.webapp_release}"
   }
 }
 
@@ -191,6 +221,22 @@ resource "azurerm_virtual_machine" "terraformvm" {
     sku       = "16.04.0-LTS"
     version   = "latest"
   }
+
+  # provisioner "file" {
+  #   source      = "./init-vm.tpl"
+  #   destination = "/tmp/init-vm.tpl"
+
+  #   connection {
+  #     # bastion_host = "${azurerm_public_ip.terraformpublicip.ip_address}"
+  #     # bastion_user = "azureuser"
+  #     host = "${azurerm_public_ip.terraformpublicip.ip_address}"
+  #     type        = "ssh"
+  #     user        = "azureuser"
+  #     private_key = "${file("../priv/id_rsa")}"
+  #     agent       = false
+  #     timeout     = "10s"
+  #   }
+  # }
 
   os_profile {
     computer_name  = "${var.prefix}vm"
@@ -218,14 +264,6 @@ resource "azurerm_virtual_machine" "terraformvm" {
   }
 }
 
-# here we will do a redis
-# we can do VM or see if there is Redis as a service
-# register service in consul
-
-# here we will do a VM
-# will add our binary
-# will run the binary
-
 data "azurerm_public_ip" "terraformpublicip" {
   name                = "${azurerm_public_ip.terraformpublicip.name}"
   resource_group_name = "${var.prefix}ResourceGroup"
@@ -234,3 +272,8 @@ data "azurerm_public_ip" "terraformpublicip" {
 output "machine_public_ip" {
   value = "${format("ssh azureuser@%s", azurerm_public_ip.terraformpublicip.ip_address)}"
 }
+
+# Install Redis
+# Download my application
+# Run
+

@@ -1,0 +1,13 @@
+
+	upstream webapp { {{range service "webapp@dc1"}}
+			server {{.Address}}:{{.Port}};{{end}}
+	}
+
+	server {
+			listen 80;
+
+			location / {
+					proxy_pass http://webapp;
+			}
+	}
+

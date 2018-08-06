@@ -1,0 +1,12 @@
+{
+    "data_dir": "/opt/consul/data",
+    "client_addr": "0.0.0.0",
+    "log_level": "INFO",
+    "ui": true,
+    "enable_script_checks" : true,
+    "retry_join": [
+        "172.20.20.11",
+        "172.20.20.12",
+        "172.20.20.13"
+    ]
+}
