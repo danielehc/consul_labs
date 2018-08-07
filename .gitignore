@@ -1,5 +1,6 @@
 .vagrant/
 .terraform/
+.kitchen/
 pkg/
 doc/
 priv/
