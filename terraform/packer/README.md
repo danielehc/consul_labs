@@ -4,7 +4,7 @@
 
 chefdk-2.5.3-1.dmg
 
-gem install kitchen-azurerm
+chef gem install kitchen-azurerm
 
 # process
 
