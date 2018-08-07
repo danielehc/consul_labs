@@ -68,7 +68,8 @@ sudo tee /etc/consul.d/consul-default.json <<EOF
 "data_dir": "/opt/consul/data",
 "client_addr": "0.0.0.0",
 "log_level": "INFO",
-"ui": true
+"ui": true,
+"enable_script_checks": true
 }
 EOF
 
@@ -120,7 +121,7 @@ sudo tee /etc/consul.d/redis.service.json <<EOF
   }
 EOF
 
-# Write redis service healthcheck  Consul config
+# Write redis service healthcheck Consul config
 sudo tee /etc/consul.d/redis.healthcheck.json <<EOF
   {
   "check": {
@@ -128,7 +129,8 @@ sudo tee /etc/consul.d/redis.healthcheck.json <<EOF
     "name": "Ping Redis",
     "args": ["redis-cli", "ping"],
     "interval": "10s",
-    "timeout": "1s"
+    "timeout": "1s",
+    "service_id": "redis"
     }
 }
 EOF
@@ -175,6 +177,53 @@ sudo tee /etc/consul.d/webapp.service.json <<EOF
     }
   }
 EOF
+
+sudo tee /etc/consul.d/webapp.healthcheck.json <<EOF
+{
+  "check": {
+    "id": "webapp-check",
+    "name": "Check Webapp",
+    "args": ["/etc/consul.d/webapp.healthcheck.1.sh"],
+    "interval": "10s",
+    "timeout": "9s",
+    "service_id": "webapp"
+  }
+}
+EOF
+
+sudo tee /etc/consul.d/webapp.healthcheck.1.sh <<EOF
+#!/usr/bin/env bash
+
+SERVICE_URL="http://localhost:8080"
+
+which lynx &> /dev/null || {
+	apt-get update
+	apt-get install -y lynx
+	apt-get clean
+}
+	
+#set initial values
+STATE_1="notanumber1"
+STATE_2="notanumber2"
+
+#get some output of the service
+STATE_1=\`lynx --dump \$SERVICE_URL 2>/dev/null\`
+STATE_2=\`lynx --dump \$SERVICE_URL 2>/dev/null\`
+
+#the test
+if [ "\$STATE_1" -eq 0 ] || [ "\$STATE_2" -eq 0 ] ; then
+	echo "Service KO"
+	exit 2
+elif [ "\$STATE_2" -gt "\$STATE_1" ]; then
+	echo "Service OK"
+	exit 0
+else
+	echo "Service KO"
+	exit 2
+fi
+EOF
+
+chmod +x /etc/consul.d/webapp.healthcheck.1.sh
 
 which killall &>/dev/null || {
   export DEBIAN_FRONTEND=noninteractive

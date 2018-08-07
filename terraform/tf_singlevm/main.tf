@@ -188,6 +188,9 @@ resource "azurerm_storage_account" "storageaccount" {
 }
 
 # here we add consul
+# Install Redis
+# Download my application
+# Run
 data "template_file" "init" {
   template = "${file("./init-vm.tpl")}"
 
@@ -226,6 +229,7 @@ resource "azurerm_virtual_machine" "terraformvm" {
   #   source      = "./init-vm.tpl"
   #   destination = "/tmp/init-vm.tpl"
 
+
   #   connection {
   #     # bastion_host = "${azurerm_public_ip.terraformpublicip.ip_address}"
   #     # bastion_user = "azureuser"
@@ -243,7 +247,6 @@ resource "azurerm_virtual_machine" "terraformvm" {
     admin_username = "azureuser"
     custom_data    = "${base64encode(data.template_file.init.rendered)}"
   }
-
   os_profile_linux_config {
     disable_password_authentication = true
 
@@ -252,12 +255,10 @@ resource "azurerm_virtual_machine" "terraformvm" {
       key_data = "${var.SSH_KEY_DATA}"
     }
   }
-
   boot_diagnostics {
     enabled     = "true"
     storage_uri = "${azurerm_storage_account.storageaccount.primary_blob_endpoint}"
   }
-
   tags {
     environment = "${var.prefix} Terraform Demo"
     datacenter  = "${var.prefix}-${var.datacenter}"
@@ -273,7 +274,5 @@ output "machine_public_ip" {
   value = "${format("ssh azureuser@%s", azurerm_public_ip.terraformpublicip.ip_address)}"
 }
 
-# Install Redis
-# Download my application
-# Run
+
 
