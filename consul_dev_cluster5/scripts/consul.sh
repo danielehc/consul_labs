@@ -10,6 +10,10 @@ which unzip curl jq route &>/dev/null || {
     sudo apt-get clean
 }
 
+###################
+# CONSUL INSTALL  #
+###################
+
 #if no consul binary we download one
 which consul &>/dev/null || {
     echo "Determining Consul version to install ..."
@@ -40,11 +44,12 @@ which consul &>/dev/null || {
     unzip /vagrant/pkg/consul_${CONSUL_DEMO_VERSION}_linux_amd64.zip 
     sudo chmod +x consul
     sudo mv consul /usr/local/bin/consul
-
-    # # https://www.consul.io/intro/getting-started/services.html
-    # sudo mkdir /etc/consul.d
-    # sudo chmod a+w /etc/consul.d
 }
+
+###################
+# CONSUL TEMPLATE #
+###################
+
 
 # If no consul-template binary we download one
 which consul-template &> /dev/null || {
@@ -60,17 +65,17 @@ which consul-template &> /dev/null || {
 	
 	if [ -f "/vagrant/pkg/consul-template${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip" ]; then
 		echo "Found Consul-template in /vagrant/pkg"
-  else
+  	else
 		echo "Fetching Consul-template version ${CONSUL_TEMPLATE_VERSION} ..."
 		mkdir -p /vagrant/pkg/
+				
+		# Downloading the archive in the /vagrant folder to reuse it for future provisionings or other VMs
 		curl -s https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip -o /vagrant/pkg/consul-template${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
 		
 		if [ $? -ne 0 ]; then
 			echo "Download failed! Exiting."
 			exit 1
 		fi
-		
-		# Copying the archive in the /vagrant folder to reuse it for future provisionings or other VMs
 
 	fi
 	
@@ -81,6 +86,10 @@ which consul-template &> /dev/null || {
 	sudo mv consul-template /usr/local/bin/consul-template
 	
 } 
+
+########################
+# CONSUL CONFIGURATION #
+########################
 
 # Getting node IP
 IFACE=`route -n | awk '$1 == "172.20.20.0" {print $8}'`
@@ -93,13 +102,13 @@ sudo chmod a+w /etc/consul.d
 cp /vagrant/etc/consul.d/consul.default.json /etc/consul.d/
 
 
-#if not running we start consul
+# Copy consul configuration using hostname to decide if the node is a server 
 if [[ "${HOSTNAME}" =~ "consul" ]]; then
-	echo server
+	echo "Configure node ${HOSTNAME} as Server"
 	cp /vagrant/etc/consul.d/consul.server.json /etc/consul.d/
 	cp /vagrant/etc/consul.d/consul.acl.json /etc/consul.d/
 else
-	echo agent
+	echo "Configure node ${HOSTNAME} as Client Agent"
 	cp /vagrant/etc/consul.d/consul.acl.agent.json /etc/consul.d/
 fi
 
@@ -109,18 +118,29 @@ which killall &>/dev/null || {
   apt-get install -y psmisc
 }
 
-#reload consul
+
+#################
+# CONSUL LAUNCH #
+#################
+
+echo "Stopping Consul ..."
+# Stop Consul
 killall consul
+
+# This avoid TIME_WAIT connections to prevent Consul from restarting
 sleep 10
 
-sudo netstat -natp
 
 /usr/local/bin/consul members &>/dev/null || {
-	echo "Starting Consul cluster ..."
+	# Start Consul
+	echo "Starting Consul ..."
 	/usr/local/bin/consul agent -bind=${IP} -config-dir /etc/consul.d > /tmp/consul.log &
 	sleep 1
 
-	curl \
+	echo "Loading ACL tokens ..."
+
+	# Generate ACL Token
+	curl -s \
     --request PUT \
     --header "X-Consul-Token: 745d360a-d408-4a0d-9c3f-99d1a32a82c8" \
     --data \
@@ -132,7 +152,8 @@ sudo netstat -natp
 	}' http://${IP}:8500/v1/acl/create
 
 
-	curl \
+	# Generate Agent Token
+	curl -s \
 		--request PUT \
 		--header "X-Consul-Token: 745d360a-d408-4a0d-9c3f-99d1a32a82c8" \
 		--data \
@@ -145,18 +166,9 @@ sudo netstat -natp
 
 }
 
-
-	killall -1 consul
-
-# if /usr/local/bin/consul members &>/dev/null; then
-# 	echo "reloading condifuration of already started consul"
-# 	consul reload
-# else
-# 	echo "Starting Consul cluster ..."
-# 	/usr/local/bin/consul agent -bind=${IP} -config-dir /etc/consul.d > /tmp/consul.log &
-# 	sleep 1
-# fi	
-
+echo "Reloading Consul configuration ..."
+# Reload Consul configuration
+killall -1 consul
 
 # Check cluster state
 /usr/local/bin/consul members
