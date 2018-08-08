@@ -51,7 +51,8 @@ The `script/azure_cli.sh` script will create a ssh key in /vagrant/priv/id_rsa a
     ```bash
     
     #project prefix
-    export TF_VAR_prefix=daniele
+    export prefix=daniele
+    export TF_VAR_prefix=${prefix}
 
     #Azure creds
     export ARM_SUBSCRIPTION_ID=your_subscription_id

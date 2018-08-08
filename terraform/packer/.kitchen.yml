@@ -1,0 +1,28 @@
+driver:
+  name: azurerm
+  subscription_id: <%= ENV['ARM_SUBSCRIPTION_ID'] %>
+  location: 'East US'
+  machine_size: 'Standard_DS2_v2'
+
+transport:
+  ssh_key: ~/.ssh/id_rsa
+
+provisioner:
+  name: shell
+
+platforms:
+  - name: azure/xenial64
+    driver:
+      image_id: /subscriptions/<%= ENV['ARM_SUBSCRIPTION_ID'] %>/resourceGroups/<%= ENV['prefix'] %>ResourceGroupForVM/providers/Microsoft.Compute/images/xenial64
+      vm_name: myxenial64
+      vm_tags:
+        ostype: linux
+        distro: ubuntu
+      use_managed_disk: true
+
+verifier:
+  name: inspec
+
+suites:
+  - name: default
+
