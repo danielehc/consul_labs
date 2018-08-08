@@ -1,0 +1,9 @@
+{
+  "check": {
+    "id": "redis-ping",
+    "name": "Ping Redis",
+    "args": ["redis-cli", "ping"],
+    "interval": "10s",
+    "timeout": "1s"
+  }
+}

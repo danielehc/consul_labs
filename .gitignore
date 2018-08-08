@@ -15,3 +15,6 @@ terraform.tfstate*
 
 single-region/
 multi-region/
+ssl/
+env/
+

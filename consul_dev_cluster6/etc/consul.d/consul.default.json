@@ -1,0 +1,19 @@
+{
+    "datacenter": "dc1",
+    "data_dir": "/opt/consul/data",
+    "client_addr": "0.0.0.0",
+    "log_level": "INFO",
+    "ui": true,
+    "enable_script_checks" : true,
+    "retry_join": [
+        "172.20.20.11",
+        "172.20.20.12",
+        "172.20.20.13"
+    ],
+    "ca_file": "/etc/consul.d/ssl/ca.cert",
+    "cert_file": "/etc/consul.d/ssl/consul.cert",
+    "key_file": "/etc/consul.d/ssl/consul.key",
+    "verify_incoming": true,
+    "verify_outgoing": true,
+    "encrypt": "91vHV0vyBY196vjy7MayHA=="
+}

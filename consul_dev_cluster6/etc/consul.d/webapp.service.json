@@ -1,0 +1,9 @@
+{
+    "service": {
+      "name": "webapp",
+      "tags": [
+        "go-webapp"
+      ],
+      "port": @@PORT@@
+    }
+  }
