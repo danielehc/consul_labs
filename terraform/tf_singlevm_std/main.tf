@@ -48,10 +48,6 @@ variable "SSH_KEY_DATA" {
   description = "The public key for SSH connection"
 }
 
-variable "custom_image_id" {
-  description = "Id for the Custom image to use for the VM"
-}
-
 # Configure the Microsoft Azure Provider
 provider "azurerm" {
   subscription_id = "${var.ARM_SUBSCRIPTION_ID}"
@@ -223,16 +219,11 @@ resource "azurerm_virtual_machine" "terraformvm" {
   }
 
   storage_image_reference {
-    id = "${var.custom_image_id}"
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04.0-LTS"
+    version   = "latest"
   }
-
-  # storage_image_reference {
-  #   publisher = "Canonical"
-  #   offer     = "UbuntuServer"
-  #   sku       = "16.04.0-LTS"
-  #   version   = "latest"
-  # }
-
 
   # provisioner "file" {
   #   source      = "./init-vm.tpl"
@@ -282,3 +273,6 @@ data "azurerm_public_ip" "terraformpublicip" {
 output "machine_public_ip" {
   value = "${format("ssh azureuser@%s", azurerm_public_ip.terraformpublicip.ip_address)}"
 }
+
+
+

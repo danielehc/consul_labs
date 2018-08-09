@@ -21,12 +21,18 @@ apt-get dist-upgrade -y ${APTARGS}
 # Update to the latest kernel
 apt-get install -y linux-generic linux-image-generic ${APTARGS}
 
-# pip
-apt-get install -y python-pip ${APTARGS}
-apt-get install -y python3-pip ${APTARGS}
+# # pip
+# apt-get install -y python-pip ${APTARGS}
+# apt-get install -y python3-pip ${APTARGS}
 
-# git
-apt-get install -y git ${APTARGS}
+# # git
+# apt-get install -y git ${APTARGS}
+
+# unzip
+apt-get install -y unzip ${APTARGS}
+
+# jq
+apt-get install -y jq ${APTARGS}
 
 # Hide Ubuntu splash screen during OS Boot, so you can see if the boot hangs
 apt-get remove -y plymouth-theme-ubuntu-text

@@ -17,6 +17,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       rs.vm.network "private_network", ip: "10.10.10.10"
       rs.vm.provision "shell", path: "scripts/terraform.sh", run: "always"     
       rs.vm.provision "shell", path: "scripts/azure_cli.sh", run: "always"              
+      rs.vm.provision "shell", path: "scripts/packer.sh", run: "always"    
+      rs.vm.provision "shell", path: "scripts/chefdk.sh", run: "always"          
   end
 
 end

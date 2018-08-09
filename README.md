@@ -59,7 +59,9 @@ vagrant up
     - Two instances of the Go web application (listening on random port picked at startup) incrementing a value in Redis everytime a page is visited. The applications are registered in Consul as a service and an healthcheck is present.
   - **Agent 4:** NGINX acts as a reverse proxy and load balancer for the Go web application. The web server is registered in Consul as a service and an healthcheck is present. The LB configuration is changed automatically based on the apps random ports and is achieved using Consul Template (https://github.com/hashicorp/consul-template)
 
-  
+* ### Consul Dev Cluster 5
+
+* ### Consul Dev Cluster 6
 
 ## FAQ
 
