@@ -15,7 +15,7 @@ variable "consul_version" {
 
 variable "consul_mode" {
   default     = "agent"
-  description = "Describes the mode to start Conul on, if server, starts Consul as a server."
+  description = "Describes the mode to start Consul on, if server, starts Consul as a server."
 }
 
 variable "cluster_size" {
