@@ -61,7 +61,19 @@ vagrant up
 
 * ### Consul Dev Cluster 5
 
+  Same configuration as Consul Dev Cluster 4 but with ACL enabled.
+
 * ### Consul Dev Cluster 6
+
+  Same configuration as Consul Dev Cluster 4 but with ACL and Encryption enabled.
+
+  :information_source: Check README for Consul Dev Cluster 6 to get prerequisite steps to have it running.  
+
+* ### Terraform
+
+  The folder contains some other projects made to replicate the Vagrant labs using Terraform (https://www.terraform.io/) to define the infrastructure.
+
+  At the moment there is no parity between the labs and the Terraform configurations nor there is any intention to make such parity happen.
 
 ## FAQ
 

@@ -42,6 +42,10 @@ which terraform &>/dev/null || {
     unzip /vagrant/pkg/terraform_${TERRAFORM_VERSION}_linux_amd64.zip 
     sudo chmod +x terraform
     sudo mv terraform /usr/local/bin/terraform
+
+    # Enable Terraform autocompletion
+    pushd /etc/bash_completion.d
+    curl -sL https://raw.githubusercontent.com/Bash-it/bash-it/master/completion/available/terraform.completion.bash -o terraform
 }
 
 
