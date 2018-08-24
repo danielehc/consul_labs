@@ -1,0 +1,35 @@
+# Vagrantfile API/syntax version.
+# NB: Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+SERVER_COUNT = 1
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "danielec/stretch64"
+  config.vm.provision "shell", path: "scripts/base.sh", run: "always"
+  
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 1024
+    v.cpus = 2
+    v.customize ["modifyvm", :id, "--groups", "/consul_lab"]
+  end
+
+  ["10.10.10", "10.10.20"].to_enum.with_index(1).each do |dcip, dc|
+    #consul server
+    (1..SERVER_COUNT).each do |i|
+      config.vm.define vm_name = "dc#{dc}-consul#{i}" do |server|
+          server.vm.hostname = vm_name
+          server.vm.network "private_network", ip: "#{dcip}.#{10+i}"
+          server.vm.provision "shell", path: "scripts/consul.sh", run: "always", env: {"SERVER_COUNT" => SERVER_COUNT}
+      end
+    end
+
+    # Redis Server
+    config.vm.define "dc#{dc}-redis-server" do |rs|
+        rs.vm.hostname = "dc#{dc}-redis"
+        rs.vm.network "private_network", ip: "#{dcip}.21"   
+        rs.vm.provision "shell", path: "scripts/consul.sh", run: "always" , env: {"SERVER_COUNT" => SERVER_COUNT}
+        rs.vm.provision "shell", path: "scripts/redis.sh", run: "always"        
+    end
+  end
+
+end

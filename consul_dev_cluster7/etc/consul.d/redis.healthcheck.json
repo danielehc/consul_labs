@@ -1,0 +1,9 @@
+{
+  "check": {
+    "id": "redis-ping",
+    "name": "Ping Redis",
+    "args": ["/etc/consul.d/redis.healthcheck.1.sh"],
+    "interval": "10s",
+    "timeout": "1s"
+  }
+}

@@ -1,0 +1,9 @@
+{
+    "acl_master_token":"745d360a-d408-4a0d-9c3f-99d1a32a82c8",
+    "acl_datacenter":"dc1",
+    "acl_default_policy":"deny",
+    "acl_down_policy": "extend-cache",
+    "acl_token":"097ba0c4-b237-7b5c-4318-162e8db53127"
+}
+
+
