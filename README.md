@@ -29,11 +29,11 @@ vagrant up
 
 ## What are the labs doing
 
-* #### Consul Dev Cluster 1 
+* #### Consul Dev Cluster 1  - Basic Cluster
 
   Spins up a simple Consul cluster with 3 servers and 2 agents
 
-* #### Consul Dev Cluster 2
+* #### Consul Dev Cluster 2 - Services and HealthChecks
 
   Spins up a Consul cluster with 3 servers and 3 agents. The 3 agents do the following:
 
@@ -41,7 +41,7 @@ vagrant up
   * **Agent 2:** Simple bash application incrementing a value in Redis
   * **Agent 3:** Simple Go (https://golang.org/) application incrementing a value in Redis
 
-* #### Consul Dev Cluster 3
+* #### Consul Dev Cluster 3 - GO Webapp + Reverse Proxy
 
   Spins up a Consul cluster with 3 servers and 2 agents. The agents do the following:
 
@@ -50,7 +50,7 @@ vagrant up
     - Go web application (listening on port `8080`) incrementing a value in Redis everytime a page is visited. The application is registered in Consul as a service and an healthcheck is present.
     - NGINX (https://www.nginx.com/) acts as a reverse proxy for the Go web application. The web server is registered in Consul as a service and an healthcheck is present.
 
-* #### Consul Dev Cluster 4
+* #### Consul Dev Cluster 4 - Consul Template
 
   Spins up a Consul cluster with 3 servers and 4 agents. The agents do the following:
 
@@ -59,13 +59,13 @@ vagrant up
     - Two instances of the Go web application (listening on random port picked at startup) incrementing a value in Redis everytime a page is visited. The applications are registered in Consul as a service and an healthcheck is present.
   - **Agent 4:** NGINX acts as a reverse proxy and load balancer for the Go web application. The web server is registered in Consul as a service and an healthcheck is present. The LB configuration is changed automatically based on the apps random ports and is achieved using Consul Template (https://github.com/hashicorp/consul-template)
 
-* #### Consul Dev Cluster 5
+* #### Consul Dev Cluster 5 - ACL
 
   Same configuration as ***Consul Dev Cluster 4*** but with ACL enabled.
 
   In this case only **Agent 1** (*Redis server instance*) is deployed.
 
-* #### Consul Dev Cluster 6
+* #### Consul Dev Cluster 6 ACL + Encryption
 
   Same configuration as ***Consul Dev Cluster 4*** but with ACL and Encryption enabled.
 
@@ -73,7 +73,7 @@ vagrant up
 
   :information_source: Check README for Consul Dev Cluster 6 to get prerequisite steps to have it running.  
 
-* #### Consul Dev Cluster 7
+* #### Consul Dev Cluster 7 - Multiple DC
 
   Same configuration as ***Consul Dev Cluster 4*** but with Multiple DC enabled.
 
