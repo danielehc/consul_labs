@@ -22,7 +22,6 @@ Some references:
    
    cd consul_labs/consul_dev_cluster6
    ```
-   
 
 2. Follow steps listed at [How to secure Consul with TLS encryption on Ubuntu 14.04](https://www.digitalocean.com/community/tutorials/how-to-secure-consul-with-tls-encryption-on-ubuntu-14-04) to generate the following files:
 
@@ -34,16 +33,12 @@ Some references:
 
    ℹ️ For the lab the domain picked for the test is `dc1`so also the certificates are created as wildcard certificates for `*.dc1`.
 
-   
-
 3. Make sure files have the correct permissions
 
    ```
    chmod 0700 etc/ssl
    shmod 0600 etc/ssl/*
    ```
-
-   
 
 4. Start the Lab
 
@@ -55,7 +50,7 @@ Some references:
 
 ## Relevant Files
 
-The configuration for Gossip and RPC Encryption is defined in `consul.defaul.json`:
+The configuration for Gossip and RPC Encryption is defined in `consul.default.json`:
 
 ```json
 {
