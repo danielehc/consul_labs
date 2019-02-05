@@ -18,7 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     (1..SERVER_COUNT).each do |i|
       config.vm.define vm_name = "dc#{dc}-consul#{i}" do |server|
           server.vm.hostname = vm_name
-          server.vm.network "private_network", ip: "#{dcip}.#{10+i}"
+          server.vm.network "private_network", ip: "#{dcip}.#{10+i}", netmask:"255.255.0.0"
           server.vm.provision "shell", path: "scripts/consul.sh", run: "always", env: {"SERVER_COUNT" => SERVER_COUNT}
       end
     end
@@ -26,7 +26,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Redis Server
     config.vm.define "dc#{dc}-redis-server" do |rs|
         rs.vm.hostname = "dc#{dc}-redis"
-        rs.vm.network "private_network", ip: "#{dcip}.21"   
+        rs.vm.network "private_network", ip: "#{dcip}.21", netmask:"255.255.0.0"   
         rs.vm.provision "shell", path: "scripts/consul.sh", run: "always" , env: {"SERVER_COUNT" => SERVER_COUNT}
         rs.vm.provision "shell", path: "scripts/redis.sh", run: "always"        
     end
